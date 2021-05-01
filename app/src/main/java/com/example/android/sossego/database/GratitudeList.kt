@@ -1,8 +1,6 @@
 package com.example.android.sossego.database
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 /*
 See here https://developer.android.com/training/data-storage/room/relationships
@@ -10,8 +8,18 @@ See here https://developer.android.com/training/data-storage/room/relationships
 @Entity(tableName = "gratitude_list_table")
 data class GratitudeList(
     @PrimaryKey(autoGenerate = true)
-    var gratitudeItemId: Long = 0L,
+    var gratitudeListId: Long = 0L,
 
     @ColumnInfo(name = "created_date")
     val createdDate: Long = System.currentTimeMillis(),
+)
+
+
+data class GratitudeListWithItems(
+    @Embedded val gratitudeList: GratitudeList,
+    @Relation(
+        parentColumn = "gratitudeListId",
+        entityColumn = "parentListId"
+    )
+    val items: List<GratitudeItem>
 )
