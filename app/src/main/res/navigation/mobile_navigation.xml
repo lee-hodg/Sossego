@@ -3,13 +3,37 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_gratitude">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.example.android.sossego.ui.home.HomeFragment"
+        android:id="@+id/navigation_gratitude"
+        android:name="com.example.android.sossego.ui.home.listing.GratitudeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_gratitude" >
+        <action
+            android:id="@+id/action_navigation_home_to_gratitudeDetailFragment"
+            app:destination="@id/gratitudeDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/gratitudeDetailFragment"
+        android:name="com.example.android.sossego.ui.home.detail.GratitudeDetailFragment"
+        android:label="GratitudeDetailFragment">
+        <argument
+            android:name="gratitudeListIdKey"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_navigation_gratitudeDetailFragment_to_home"
+            app:destination="@id/navigation_home"
+            app:launchSingleTop="false"
+            app:popUpTo="@+id/navigation_home"
+            app:popUpToInclusive="true"
+            />
+    </fragment>
+
+
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -22,4 +46,5 @@
         android:name="com.example.android.sossego.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
 </navigation>

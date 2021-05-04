@@ -25,16 +25,17 @@ interface GratitudeDatabaseDao {
      * Selects and returns the row that matches the supplied id
      *
      * @param key gratitudeListId
+     * https://stackoverflow.com/questions/46445964/room-not-sure-how-to-convert-a-cursor-to-this-methods-return-type-which-meth
+     * No need for both suspend and livedata
      */
     @Query("SELECT * from gratitude_list_table WHERE gratitudeListId = :key")
-    suspend fun get(key: Long): GratitudeList?
-
+    fun getGratitudeList(key: Long): LiveData<GratitudeList?>
 
     @Query("SELECT * from gratitude_item_table WHERE gratitudeItemId = :key")
     suspend fun getItem(key: Long): GratitudeItem?
 
     @Query("SELECT * from gratitude_item_table")
-    suspend fun getAllItems(): List<GratitudeItem>
+    fun getAllItems(): List<GratitudeItem>
 
     /**
      * Deletes all values from the table.
