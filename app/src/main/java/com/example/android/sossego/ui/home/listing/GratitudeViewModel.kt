@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.example.android.sossego.database.GratitudeDatabaseDao
 import com.example.android.sossego.database.GratitudeList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GratitudeViewModel(
     val database: GratitudeDatabaseDao,
@@ -12,9 +14,6 @@ class GratitudeViewModel(
 ) : AndroidViewModel(application) {
 
     val gratitudeLists = database.getAllGratitudeLists()
-
-
-    private var latestGratitudeList = MutableLiveData<GratitudeList?>()
 
 
     /**
@@ -43,12 +42,18 @@ class GratitudeViewModel(
         _navigateToGratitudeListDetail.value = gratitudeListId
     }
 
+    private suspend fun insert(gratitudeList: GratitudeList) {
+        withContext(Dispatchers.IO) {
+            database.insert(gratitudeList)
+        }
+    }
+
     fun addNewGratitudeList(){
         viewModelScope.launch {
 
             val newGratitudeList = GratitudeList()
 
-            database.insert(newGratitudeList)
+            insert(newGratitudeList)
 
             _navigateToGratitudeListDetail.value  = database.getLatestGratitudeList()?.gratitudeListId
         }

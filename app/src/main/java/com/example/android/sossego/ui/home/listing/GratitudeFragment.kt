@@ -55,6 +55,8 @@ class GratitudeFragment : Fragment() {
         })
         binding.gratitudeList.adapter = adapter
 
+        binding.lifecycleOwner = this
+
         gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitGratitudeList(it)

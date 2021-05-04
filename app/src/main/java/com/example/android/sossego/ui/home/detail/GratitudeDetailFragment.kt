@@ -52,6 +52,8 @@ class GratitudeDetailFragment : Fragment() {
         // give the binding object a reference to it.
         binding.gratitudeDetailViewModel = gratitudeDetailViewModel
 
+        binding.lifecycleOwner = this
+
         Timber.tag(TAG).d("gratitudeDetailViewModel has list ${gratitudeDetailViewModel.gratitudeList}")
         // Add an Observer to the state variable for Navigating when a Quality icon is tapped.
         gratitudeDetailViewModel.navigateToGratitudeFragment.observe(viewLifecycleOwner, Observer {
