@@ -1,7 +1,6 @@
-package com.example.android.sossego.ui.home
+package com.example.android.sossego.ui.home.listing
 
 import com.example.android.sossego.database.GratitudeList
-import kotlinx.android.synthetic.main.fragment_gratitude.view.*
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -31,17 +30,14 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is ViewHolder -> {
-                val gratitudeListItem = getItem(position) as DataItem.GratitudeListItem
-                holder.bind(clickListener, gratitudeListItem.gratitudeList)
-            }
-        }
+            val viewHolder = holder as ViewHolder
+            val gratitudeListItem = getItem(position) as DataItem.GratitudeListItem
+            viewHolder.bind(clickListener, gratitudeListItem.gratitudeList)
+
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ViewHolder.from(parent)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+            ViewHolder.from(parent)
 
     class ViewHolder private constructor(private val binding: ListItemGratitudeBinding)
         : RecyclerView.ViewHolder(binding.root) {
@@ -55,7 +51,8 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ListItemGratitudeBinding.inflate(layoutInflater, parent, false)
+                val binding = ListItemGratitudeBinding.inflate(layoutInflater, parent,
+                        false)
                 return ViewHolder(binding)
             }
         }

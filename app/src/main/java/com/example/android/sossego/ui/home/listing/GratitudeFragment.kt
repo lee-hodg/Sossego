@@ -6,19 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.sossego.R
 import com.example.android.sossego.database.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
 import com.example.android.sossego.ui.home.*
 
 class GratitudeFragment : Fragment() {
-
-    private lateinit var gratitudeViewModel: GratitudeViewModel
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -39,17 +35,6 @@ class GratitudeFragment : Fragment() {
         // make it accessible to the binding
         binding.gratitudeViewModel = gratitudeViewModel
 
-
-        val manager = LinearLayoutManager(activity)
-        binding.gratitudeList.layoutManager = manager
-
-//        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-//            override fun getSpanSize(position: Int) =  when (position) {
-//                0 -> 3
-//                else -> 1
-//            }
-//        }
-
         val adapter = GratitudeListAdapter(GratitudeListListener { gratitudeListId ->
             gratitudeViewModel.onGratitudeListClicked(gratitudeListId)
         })
@@ -57,7 +42,7 @@ class GratitudeFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, Observer {
+        gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, {
             it?.let {
                 adapter.submitGratitudeList(it)
             }
