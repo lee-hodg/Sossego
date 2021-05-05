@@ -40,6 +40,7 @@
             android:layout_marginEnd="@dimen/margin2x"
             android:layout_marginBottom="@dimen/margin2x"
             android:clickable="false"
+            android:contentDescription="@string/add_gratitude_list_fab_content"
             android:onClick="@{() -> gratitudeViewModel.addNewGratitudeList()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

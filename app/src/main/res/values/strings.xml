@@ -4,4 +4,5 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="item_count_template">Item count: %1$d</string>
+    <string name="add_gratitude_list_fab_content">Add New Gratitude List</string>
 </resources>
