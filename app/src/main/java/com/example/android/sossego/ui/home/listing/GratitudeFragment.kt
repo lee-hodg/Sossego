@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.android.sossego.R
 import com.example.android.sossego.database.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
-import com.example.android.sossego.ui.home.*
 
 class GratitudeFragment : Fragment() {
 
@@ -35,18 +34,7 @@ class GratitudeFragment : Fragment() {
         // make it accessible to the binding
         binding.gratitudeViewModel = gratitudeViewModel
 
-        val adapter = GratitudeListAdapter(GratitudeListListener { gratitudeListId ->
-            gratitudeViewModel.onGratitudeListClicked(gratitudeListId)
-        })
-        binding.gratitudeList.adapter = adapter
-
         binding.lifecycleOwner = this
-
-        gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, {
-            it?.let {
-                adapter.submitGratitudeList(it)
-            }
-        })
 
         // Add an Observer on the state variable for Navigating when STOP button is pressed.
         gratitudeViewModel.navigateToGratitudeListDetail.observe(viewLifecycleOwner,
@@ -66,6 +54,17 @@ class GratitudeFragment : Fragment() {
                     gratitudeViewModel.doneNavigating()
                 }
             })
+
+        val gratitudeListAdapter = GratitudeListAdapter(GratitudeListListener { gratitudeListId ->
+            gratitudeViewModel.onGratitudeListClicked(gratitudeListId)
+        })
+        binding.gratitudeListRecycler.adapter = gratitudeListAdapter
+
+        gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, {
+            it?.let {
+                gratitudeListAdapter.submitGratitudeList(it)
+            }
+        })
 
         return binding.root
     }
