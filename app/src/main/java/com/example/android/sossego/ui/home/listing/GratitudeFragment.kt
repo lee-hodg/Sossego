@@ -58,13 +58,14 @@ class GratitudeFragment : Fragment() {
         val gratitudeListAdapter = GratitudeListAdapter(GratitudeListListener { gratitudeListId ->
             gratitudeViewModel.onGratitudeListClicked(gratitudeListId)
         })
-        binding.gratitudeListRecycler.adapter = gratitudeListAdapter
 
         gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, {
             it?.let {
                 gratitudeListAdapter.submitGratitudeList(it)
             }
         })
+
+        binding.gratitudeListRecycler.adapter = gratitudeListAdapter
 
         return binding.root
     }

@@ -17,9 +17,9 @@ fun convertNumericQualityToString(num: Long): String {
 
 
 @BindingAdapter("gratitudeListIdString")
-fun TextView.setGratitudeListIdString(item: GratitudeList) {
-    Timber.d("setGratitudeListIdString binding adapter got item ${item.gratitudeListId}")
-    item.let {
+fun TextView.setGratitudeListIdString(item: GratitudeList?) {
+    Timber.d("setGratitudeListIdString binding adapter got item ${item?.gratitudeListId}")
+    item?.let {
         text = convertNumericQualityToString(item.gratitudeListId)
     }
 }
