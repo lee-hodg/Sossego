@@ -7,30 +7,30 @@
 
     <fragment
         android:id="@+id/navigation_gratitude"
-        android:name="com.example.android.sossego.ui.home.listing.GratitudeFragment"
+        android:name="com.example.android.sossego.ui.gratitude.listing.GratitudeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_gratitude" >
         <action
-            android:id="@+id/action_navigation_home_to_gratitudeDetailFragment"
+            android:id="@+id/action_navigation_gratitude_to_gratitudeDetailFragment"
             app:destination="@id/gratitudeDetailFragment"
             app:enterAnim="@anim/slide_in_right"
             app:popEnterAnim="@anim/slide_in_right"
-            />
+            app:popUpTo="@id/navigation_gratitude"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/gratitudeDetailFragment"
-        android:name="com.example.android.sossego.ui.home.detail.GratitudeDetailFragment"
+        android:name="com.example.android.sossego.ui.gratitude.detail.GratitudeDetailFragment"
         android:label="GratitudeDetailFragment">
         <argument
             android:name="gratitudeListIdKey"
             app:argType="long" />
         <action
             android:id="@+id/action_navigation_gratitudeDetailFragment_to_home"
-            app:destination="@id/navigation_home"
+            app:destination="@id/navigation_gratitude"
             app:launchSingleTop="false"
-            app:popUpTo="@+id/navigation_home"
-            app:popUpToInclusive="true"
-            />
+            app:popUpTo="@id/gratitudeDetailFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 

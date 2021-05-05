@@ -1,9 +1,8 @@
-package com.example.android.sossego.ui.home.detail
+package com.example.android.sossego.ui.gratitude.detail
 
 import androidx.lifecycle.*
 import com.example.android.sossego.database.GratitudeDatabaseDao
 import com.example.android.sossego.database.GratitudeList
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class GratitudeDetailViewModel (

@@ -12,6 +12,8 @@ data class GratitudeList(
 
     @ColumnInfo(name = "created_date")
     val createdDate: Long = System.currentTimeMillis(),
+
+    val elementCount: Int = 0
 )
 
 

@@ -1,4 +1,4 @@
-package com.example.android.sossego.ui.home.listing
+package com.example.android.sossego.ui.gratitude.listing
 
 import android.app.Application
 import androidx.lifecycle.*
@@ -13,8 +13,7 @@ class GratitudeViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    val gratitudeLists = database.getAllGratitudeLists()
-
+    val gratitudeLists = database.getAllGratitudeListsWithElementCount()
 
     /**
               Navigation from list to detail

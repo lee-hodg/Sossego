@@ -12,7 +12,7 @@
 
         <variable
             name="gratitudeDetailViewModel"
-            type="com.example.android.sossego.ui.home.detail.GratitudeDetailViewModel" />
+            type="com.example.android.sossego.ui.gratitude.detail.GratitudeDetailViewModel" />
     </data>
 
     <!-- Start of the visible fragment layout using ConstraintLayout -->

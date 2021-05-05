@@ -1,4 +1,4 @@
-package com.example.android.sossego.ui.home.listing
+package com.example.android.sossego.ui.gratitude.listing
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

@@ -11,22 +11,22 @@
 
         <variable
             name="gratitudeViewModel"
-            type="com.example.android.sossego.ui.home.listing.GratitudeViewModel" />
+            type="com.example.android.sossego.ui.gratitude.listing.GratitudeViewModel" />
     </data>
 
     <!-- Start of the visible fragment layout using ConstraintLayout -->
     <androidx.constraintlayout.widget.ConstraintLayout  android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.listing.GratitudeFragment">
+    tools:context=".ui.gratitude.listing.GratitudeFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/gratitude_list_recycler"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginBottom="@dimen/margin"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

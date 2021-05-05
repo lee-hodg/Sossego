@@ -37,6 +37,9 @@ interface GratitudeDatabaseDao {
     @Query("SELECT * from gratitude_item_table")
     fun getAllItems(): List<GratitudeItem>
 
+    @Query("SELECT * from gratitude_item_table WHERE parentListId - :key ORDER BY gratitudeItemId DESC")
+    fun getAllItemsForGratitudeList(key: Long): LiveData<List<GratitudeItem>>
+
     /**
      * Deletes all values from the table.
      *
@@ -53,13 +56,18 @@ interface GratitudeDatabaseDao {
     @Query("SELECT * FROM gratitude_list_table ORDER BY created_date DESC")
     fun getAllGratitudeLists(): LiveData<List<GratitudeList>>
 
+    @Query("SELECT P.gratitudeListId, P.created_date, COUNT(C.parentListId) as elementCount" +
+            " FROM gratitude_list_table P  LEFT OUTER JOIN gratitude_item_table  C" +
+            " ON P.gratitudeListId=C.parentListId  GROUP BY P.gratitudeListId ORDER BY created_date DESC")
+    fun getAllGratitudeListsWithElementCount(): LiveData<List<GratitudeList>>
+
     /**
      * Selects and returns the latest gratitude list.
      */
     @Query("SELECT * FROM gratitude_list_table ORDER BY created_date DESC LIMIT 1")
     suspend fun getLatestGratitudeList(): GratitudeList?
 
-    @Transaction
-    @Query("SELECT * FROM gratitude_list_table ORDER BY created_date DESC")
-    suspend fun getGratitudeListsWithItems(): List<GratitudeListWithItems>
+//    @Transaction
+//    @Query("SELECT * FROM gratitude_list_table ORDER BY created_date DESC")
+//    suspend fun getGratitudeListsWithItems(): List<GratitudeListWithItems>
 }

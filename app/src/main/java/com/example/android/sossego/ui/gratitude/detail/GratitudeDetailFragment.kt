@@ -1,4 +1,4 @@
-package com.example.android.sossego.ui.home.detail
+package com.example.android.sossego.ui.gratitude.detail
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -69,4 +69,6 @@ class GratitudeDetailFragment : Fragment() {
 
         return binding.root
     }
+
+
 }

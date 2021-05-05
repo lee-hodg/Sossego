@@ -1,4 +1,4 @@
-package com.example.android.sossego.ui.home.detail
+package com.example.android.sossego.ui.gratitude.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

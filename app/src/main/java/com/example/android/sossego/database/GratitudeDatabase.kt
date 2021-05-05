@@ -13,7 +13,7 @@ import androidx.room.RoomDatabase
  * This pattern is pretty much the same for any database,
  * so you can reuse it.
  */
-@Database(entities = [GratitudeList::class, GratitudeItem::class], version = 1,
+@Database(entities = [GratitudeList::class, GratitudeItem::class], version = 2,
     exportSchema = false)
 abstract class GratitudeDatabase : RoomDatabase() {
 

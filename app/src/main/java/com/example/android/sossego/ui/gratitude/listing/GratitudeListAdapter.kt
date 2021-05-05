@@ -1,5 +1,6 @@
-package com.example.android.sossego.ui.home.listing
+package com.example.android.sossego.ui.gratitude.listing
 
+import android.provider.Settings.System.getString
 import com.example.android.sossego.database.GratitudeList
 
 import android.view.LayoutInflater
@@ -7,7 +8,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.sossego.R
 import com.example.android.sossego.databinding.ListItemGratitudeBinding
+import kotlinx.android.synthetic.main.list_item_gratitude.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,13 +42,17 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             ViewHolder.from(parent)
 
+
     class ViewHolder private constructor(private val binding: ListItemGratitudeBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(clickListener: GratitudeListListener, item: GratitudeList) {
             binding.gratitudeList = item
             binding.clickListener = clickListener
+            binding.listElementCount.text = this.itemView.resources.getString(
+                    R.string.item_count_template, item.elementCount)
             binding.executePendingBindings()
+
         }
 
         companion object {
@@ -62,7 +69,7 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
 /**
  * Callback for calculating the diff between two non-null items in a list.
  *
- * Used by ListAdapter to calculate the minumum number of changes between and old list and a new
+ * Used by ListAdapter to calculate the minimum number of changes between and old list and a new
  * list that's been passed to `submitList`.
  */
 class GratitudeListDiffCallback : DiffUtil.ItemCallback<DataItem>() {
