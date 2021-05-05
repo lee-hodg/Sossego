@@ -22,20 +22,17 @@
         tools:context=".ui.GratitudeDetailFragment">
 
         <TextView
-            android:id="@+id/gratitude_list_id_text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:id="@+id/detail_creation_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center_vertical"
-            app:gratitudeListIdString="@{gratitudeDetailViewModel.gratitudeList}"
-            app:layout_constraintBottom_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:textStyle="bold"
+            app:gratitudeListCreatedDate="@{gratitudeDetailViewModel.gratitudeList}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="1234578-1234-34324-12332423" />
+            tools:text="Friday May-05-2021 15:45" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
