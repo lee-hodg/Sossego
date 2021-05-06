@@ -12,6 +12,9 @@ interface GratitudeDatabaseDao {
     @Insert
     suspend fun insertItem(gratitudeItem: GratitudeItem)
 
+    @Query("DELETE FROM gratitude_item_table WHERE gratitudeItemId = :gratitudeItemKey")
+    suspend fun deleteItem(gratitudeItemKey: Long)
+
     /**
      * When updating a row with a value already set in a column,
      * replaces the old value with the new one.
@@ -37,7 +40,7 @@ interface GratitudeDatabaseDao {
     @Query("SELECT * from gratitude_item_table")
     fun getAllItems(): List<GratitudeItem>
 
-    @Query("SELECT * from gratitude_item_table WHERE parentListId - :key ORDER BY gratitudeItemId DESC")
+    @Query("SELECT * from gratitude_item_table WHERE parentListId = :key ORDER BY gratitudeItemId DESC")
     fun getAllItemsForGratitudeList(key: Long): LiveData<List<GratitudeItem>>
 
     /**

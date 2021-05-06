@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/navigation_gratitude"
         android:name="com.example.android.sossego.ui.gratitude.listing.GratitudeFragment"
-        android:label="@string/title_home"
+        android:label="@string/title_gratitude"
         tools:layout="@layout/fragment_gratitude" >
         <action
             android:id="@+id/action_navigation_gratitude_to_gratitudeDetailFragment"

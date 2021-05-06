@@ -5,4 +5,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="item_count_template">Item count: %1$d</string>
     <string name="add_gratitude_list_fab_content">Add New Gratitude List</string>
+    <string name="delete_gratitude_item">Delete gratitude item</string>
+    <string name="title_gratitude">Gratitude</string>
+    <string name="new_gratitude_item_hint">What are you grateful for today?</string>
 </resources>

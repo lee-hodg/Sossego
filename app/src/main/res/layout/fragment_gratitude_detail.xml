@@ -34,5 +34,46 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Friday May-05-2021 15:45" />
 
+
+        <!--        2-way binding has @=-->
+        <EditText
+            android:id="@+id/new_gratitude_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginEnd="8dp"
+            android:hint="@string/new_gratitude_item_hint"
+            android:text="@={gratitudeDetailViewModel.newGratitudeItemText}"
+            android:inputType="text"
+            app:layout_constraintEnd_toStartOf="@+id/add_item_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detail_creation_date" />
+
+        <Button
+            android:id="@+id/add_item_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:onClick="@{() -> gratitudeDetailViewModel.addNewItem()}"
+            app:layout_constraintBottom_toTopOf="@+id/gratitude_detail_recycler"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detail_creation_date" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/gratitude_detail_recycler"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginEnd="@dimen/margin"
+            android:layout_marginBottom="@dimen/margin"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/new_gratitude_item" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

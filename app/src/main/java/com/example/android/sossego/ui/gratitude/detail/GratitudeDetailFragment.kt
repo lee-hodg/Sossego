@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.android.sossego.R
 import com.example.android.sossego.database.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeDetailBinding
+import com.example.android.sossego.ui.gratitude.listing.GratitudeListAdapter
+import com.example.android.sossego.ui.gratitude.listing.GratitudeListListener
 import timber.log.Timber
 
 
@@ -66,6 +68,22 @@ class GratitudeDetailFragment : Fragment() {
                 gratitudeDetailViewModel.doneNavigating()
             }
         })
+
+        // Build an adapter for our recyclerview.
+        val gratitudeDetailAdapter = GratitudeDetailAdapter(GratitudeItemListener { gratitudeItemId ->
+            gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItemId)
+        })
+
+        // We observe the gratitudeLists liveData of the view model. If it changes we must
+        // rebuild the recycler view with submitList
+        gratitudeDetailViewModel.gratitudeItems.observe(viewLifecycleOwner, {
+            it?.let {
+                gratitudeDetailAdapter.submitGratitudeItemList(it)
+            }
+        })
+
+        // Set our recyclerview to use this adapter
+        binding.gratitudeDetailRecycler.adapter = gratitudeDetailAdapter
 
         return binding.root
     }
