@@ -8,4 +8,7 @@
     <string name="delete_gratitude_item">Delete gratitude item</string>
     <string name="title_gratitude">Gratitude</string>
     <string name="new_gratitude_item_hint">What are you grateful for today?</string>
+    <string name="save_button_text">Save</string>
+    <string name="delete_button_text">Delete</string>
+    <string name="clear_button_text">Clear</string>
 </resources>

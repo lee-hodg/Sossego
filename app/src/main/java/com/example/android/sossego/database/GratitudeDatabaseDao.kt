@@ -1,6 +1,7 @@
 package com.example.android.sossego.database
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
 @Dao
@@ -24,6 +25,10 @@ interface GratitudeDatabaseDao {
     @Update
     suspend fun update(gratitudeList: GratitudeList)
 
+
+    @Update
+    suspend fun updateItem(gratitudeItem: GratitudeItem)
+
     /**
      * Selects and returns the row that matches the supplied id
      *
@@ -41,15 +46,19 @@ interface GratitudeDatabaseDao {
     fun getAllItems(): List<GratitudeItem>
 
     @Query("SELECT * from gratitude_item_table WHERE parentListId = :key ORDER BY gratitudeItemId DESC")
-    fun getAllItemsForGratitudeList(key: Long): LiveData<List<GratitudeItem>>
+    fun getAllItemsForGratitudeList(key: Long): MutableLiveData<List<GratitudeItem>>
 
     /**
      * Deletes all values from the table.
      *
      * This does not delete the table, only its contents.
      */
-    @Query("DELETE FROM gratitude_list_table")
-    suspend fun clear()
+    @Query("DELETE FROM gratitude_item_table WHERE parentListId = :key")
+    suspend fun clearGratitudeListItems(key: Long)
+
+
+    @Query("DELETE FROM gratitude_list_table WHERE gratitudeListId = :key")
+    suspend fun deleteGratitudeList(key: Long)
 
     /**
      * Selects and returns all rows in the table,
