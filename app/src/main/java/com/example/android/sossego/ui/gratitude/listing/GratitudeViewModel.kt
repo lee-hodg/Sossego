@@ -58,4 +58,18 @@ class GratitudeViewModel(
         }
     }
 
+    private suspend fun delete(gratitudeListId: Long) {
+        withContext(Dispatchers.IO) {
+            database.deleteGratitudeList(gratitudeListId)
+        }
+    }
+
+    fun deleteGratitudeList(gratitudeListId: Long){
+        viewModelScope.launch {
+
+            delete(gratitudeListId)
+
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.example.android.sossego.ui.gratitude.detail
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.database.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeDetailBinding
+import com.example.android.sossego.hideKeyboard
 import timber.log.Timber
 
 
@@ -83,6 +85,26 @@ class GratitudeDetailFragment : Fragment() {
         gratitudeDetailViewModel.gratitudeItems.observe(viewLifecycleOwner, {
             it?.let {
                 gratitudeDetailAdapter.submitGratitudeItemList(it)
+            }
+        })
+
+        // When enter is used to add a new gratitude item
+        binding.newGratitudeItem.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                //Perform Code
+                gratitudeDetailViewModel.addNewItem()
+                return@OnKeyListener true
+            }
+            false
+        })
+
+        // Hide the soft keyboard for example when a new gratitude item is added
+        // this is a UI action so happens in the fragment, but the logic to determine
+        // if it should happen lives in the viewmodel
+        gratitudeDetailViewModel.hideSoftKeyboard.observe(viewLifecycleOwner, {
+            it?.let {
+                hideKeyboard()
+                gratitudeDetailViewModel.softKeyboardHidden()
             }
         })
 

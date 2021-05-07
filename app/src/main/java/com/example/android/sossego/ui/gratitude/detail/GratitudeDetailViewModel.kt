@@ -39,6 +39,18 @@ class GratitudeDetailViewModel (
         //Timber.d("GratitudeDetailViewModel obtained gratitudeList ${database.get(gratitudeListKey)?.value}")
     }
 
+    /** Should be close the softkeyboard (e.g. after adding new item)?
+     *
+     */
+    private val _hideSoftKeyboard = MutableLiveData<Boolean?>()
+
+    val hideSoftKeyboard: LiveData<Boolean?>
+        get() = _hideSoftKeyboard
+
+    fun softKeyboardHidden(){
+        _hideSoftKeyboard.value = null
+    }
+
     /**
      *     Deal with navigation
      */
@@ -94,6 +106,8 @@ class GratitudeDetailViewModel (
             }
         }
 
+        // hide soft keyboard
+        _hideSoftKeyboard.value = true
         // clear
         newGratitudeItemText.value = null
     }

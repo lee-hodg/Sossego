@@ -9,9 +9,12 @@ import androidx.databinding.DataBindingUtil
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.database.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
+import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
 
 /**
  * This is responsible for the listing of gratitude lists which will be displayed
@@ -82,6 +85,17 @@ class GratitudeFragment : Fragment() {
 
         // Set our recyclerview to use this adapter
         binding.gratitudeListRecycler.adapter = gratitudeListAdapter
+
+        // Swipe to delete action
+        val swipeHandler = object : SwipeToDeleteCallback(this.requireContext()) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val gratitudeListId = gratitudeListAdapter.currentList[viewHolder.adapterPosition] as DataItem.GratitudeListItem
+                val currentListId = gratitudeListId.gratitudeList.gratitudeListId
+                gratitudeViewModel.deleteGratitudeList(currentListId)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(binding.gratitudeListRecycler)
 
         return binding.root
     }
