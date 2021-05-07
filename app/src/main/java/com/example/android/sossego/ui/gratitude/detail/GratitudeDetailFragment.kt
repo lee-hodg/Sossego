@@ -6,14 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.android.sossego.R
 import com.example.android.sossego.database.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeDetailBinding
-import com.example.android.sossego.ui.gratitude.listing.GratitudeListAdapter
-import com.example.android.sossego.ui.gratitude.listing.GratitudeListListener
 import timber.log.Timber
 
 
@@ -30,7 +27,7 @@ class GratitudeDetailFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
 
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentGratitudeDetailBinding = DataBindingUtil.inflate(
@@ -38,9 +35,9 @@ class GratitudeDetailFragment : Fragment() {
 
         // Now we build the view model and take the safeargs passed
         val application = requireNotNull(this.activity).application
-        val arguments = GratitudeDetailFragmentArgs.fromBundle(arguments!!)
+        val arguments = GratitudeDetailFragmentArgs.fromBundle(requireArguments())
 
-        Timber.tag(TAG).d("We got arguments $arguments");
+        Timber.tag(TAG).d("We got arguments $arguments")
 
         // Create an instance of the ViewModel Factory.
         val dataSource = GratitudeDatabase.getInstance(application).gratitudeDatabaseDao
@@ -58,7 +55,7 @@ class GratitudeDetailFragment : Fragment() {
 
         Timber.tag(TAG).d("gratitudeDetailViewModel has list ${gratitudeDetailViewModel.gratitudeList}")
         // Add an Observer to the state variable for Navigating when a Quality icon is tapped.
-        gratitudeDetailViewModel.navigateToGratitudeFragment.observe(viewLifecycleOwner, Observer {
+        gratitudeDetailViewModel.navigateToGratitudeFragment.observe(viewLifecycleOwner, {
             if (it == true) { // Observed state is true.
                 this.findNavController().navigate(
                     GratitudeDetailFragmentDirections.actionNavigationGratitudeDetailFragmentToHome()

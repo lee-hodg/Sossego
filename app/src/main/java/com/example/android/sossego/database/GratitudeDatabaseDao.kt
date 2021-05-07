@@ -46,7 +46,7 @@ interface GratitudeDatabaseDao {
     fun getAllItems(): List<GratitudeItem>
 
     @Query("SELECT * from gratitude_item_table WHERE parentListId = :key ORDER BY gratitudeItemId DESC")
-    fun getAllItemsForGratitudeList(key: Long): MutableLiveData<List<GratitudeItem>>
+    fun getAllItemsForGratitudeList(key: Long): LiveData<List<GratitudeItem>>
 
     /**
      * Deletes all values from the table.

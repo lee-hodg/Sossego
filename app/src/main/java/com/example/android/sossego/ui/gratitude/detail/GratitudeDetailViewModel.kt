@@ -15,7 +15,7 @@ class GratitudeDetailViewModel (
 
     val gratitudeList = MediatorLiveData<GratitudeList>()
 
-    val gratitudeItems = MediatorLiveData<List<GratitudeItem>>()
+    val gratitudeItems: MediatorLiveData<List<GratitudeItem>> = MediatorLiveData<List<GratitudeItem>>()
 
     // Initial value of EditText for new gratitude items being added
     val newGratitudeItemText = MutableLiveData<String?>()
@@ -36,21 +36,21 @@ class GratitudeDetailViewModel (
      *     Deal with navigation
      */
     /**
-     * Variable that tells the fragment whether it should navigate to [GratitudeFragment].
+     * Variable that tells the fragment whether it should navigate to GratitudeFragment.
      *
-     * This is `private` because we don't want to expose the ability to set [MutableLiveData] to
-     * the [Fragment]
+     * This is `private` because we don't want to expose the ability to set MutableLiveData to
+     * the Fragment
      */
     private val _navigateToGratitude = MutableLiveData<Boolean?>()
 
     /**
-     * When true immediately navigate back to the [GratitudeFragment]
+     * When true immediately navigate back to the GratitudeFragment
      */
     val navigateToGratitudeFragment: LiveData<Boolean?>
         get() = _navigateToGratitude
 
     /**
-     * Call this immediately after navigating to [GratitudeFragment]
+     * Call this immediately after navigating to GratitudeFragment
      */
     fun doneNavigating() {
         _navigateToGratitude.value = null
@@ -89,6 +89,33 @@ class GratitudeDetailViewModel (
         // clear
         newGratitudeItemText.value = ""
     }
+
+    private suspend fun deleteList() {
+        withContext(Dispatchers.IO) {
+            database.deleteGratitudeList(gratitudeListKey)
+        }
+    }
+
+    fun deleteGratitudeList(){
+        viewModelScope.launch {
+            deleteList()
+        }
+        // go back to listing
+        _navigateToGratitude.value = true
+    }
+
+    private suspend fun clearList() {
+        withContext(Dispatchers.IO) {
+            database.clearGratitudeListItems(gratitudeListKey)
+        }
+    }
+
+    fun clearGratitudeList(){
+        viewModelScope.launch {
+            clearList()
+        }
+    }
+
 
 //    fun onNewGratitudeItemDone(gratitudeListId: Long, view: View, actionId: Int, event: KeyEvent?): Boolean {
 //
