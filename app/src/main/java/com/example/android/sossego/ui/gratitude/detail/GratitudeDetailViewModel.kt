@@ -13,9 +13,15 @@ class GratitudeDetailViewModel (
     private val gratitudeListKey: Long = 0L,
     val database: GratitudeDatabaseDao) : ViewModel() {
 
-    val gratitudeList = MediatorLiveData<GratitudeList>()
+    val gratitudeList:  LiveData<GratitudeList?>
 
-    val gratitudeItems: MediatorLiveData<List<GratitudeItem>> = MediatorLiveData<List<GratitudeItem>>()
+    var gratitudeItems: LiveData<List<GratitudeItem>>
+
+//    var gratitudeItems = MediatorLiveData<List<GratitudeItem>>()
+//        set(value) {
+//            field = value
+//            Timber.d("Setting gratitudeItems value $value")
+//        }
 
     // Initial value of EditText for new gratitude items being added
     val newGratitudeItemText = MutableLiveData<String?>()
@@ -24,11 +30,12 @@ class GratitudeDetailViewModel (
 
     init {
         Timber.d("GratitudeDetailViewModel fetching gratitudeList by key: $gratitudeListKey")
-        gratitudeList.addSource(database.getGratitudeList(gratitudeListKey),
-                gratitudeList::setValue)
-        gratitudeItems.addSource(database.getAllItemsForGratitudeList(gratitudeListKey),
-                gratitudeItems::setValue)
-
+//        gratitudeList.addSource(database.getGratitudeList(gratitudeListKey),
+//                gratitudeList::setValue)
+        gratitudeList = database.getGratitudeList(gratitudeListKey)
+//        gratitudeItems.addSource(database.getAllItemsForGratitudeList(gratitudeListKey),
+//                gratitudeItems::setValue)
+        gratitudeItems = database.getAllItemsForGratitudeList(gratitudeListKey)
         //Timber.d("GratitudeDetailViewModel obtained gratitudeList ${database.get(gratitudeListKey)?.value}")
     }
 
@@ -70,7 +77,6 @@ class GratitudeDetailViewModel (
 
     }
 
-
     private suspend fun insert(gratitudeItem: GratitudeItem) {
         withContext(Dispatchers.IO) {
             database.insertItem(gratitudeItem)
@@ -79,15 +85,17 @@ class GratitudeDetailViewModel (
 
     fun addNewItem(){
         viewModelScope.launch {
-
-            newGratitudeItemText.value?.let {
-                val newGratitudeItem = GratitudeItem(parentListId = gratitudeListKey,
-                        gratitudeText = newGratitudeItemText.value.toString())
+            if(!newGratitudeItemText.value.isNullOrEmpty()) {
+                val newItemText = newGratitudeItemText.value.toString()
+                val newGratitudeItem = GratitudeItem(
+                    parentListId = gratitudeListKey,
+                    gratitudeText = newItemText)
                 insert(newGratitudeItem)
             }
         }
+
         // clear
-        newGratitudeItemText.value = ""
+        newGratitudeItemText.value = null
     }
 
     private suspend fun deleteList() {
@@ -116,24 +124,20 @@ class GratitudeDetailViewModel (
         }
     }
 
+    private suspend fun updateItem(gratitudeItem: GratitudeItem) {
+        withContext(Dispatchers.IO) {
+            database.updateItem(gratitudeItem)
+        }
+    }
 
-//    fun onNewGratitudeItemDone(gratitudeListId: Long, view: View, actionId: Int, event: KeyEvent?): Boolean {
-//
-//        val imeAction = when (actionId) {
-//            EditorInfo.IME_ACTION_DONE,
-//            EditorInfo.IME_ACTION_SEND,
-//            EditorInfo.IME_ACTION_GO -> true
-//            else -> false
-//        }
-//
-//        val keyDownEvent = event?.keyCode == KeyEvent.KEYCODE_ENTER
-//                && event.action == KeyEvent.ACTION_DOWN
-//
-//        if (imeAction or keyDownEvent){
-//            addNewGratitudeItem(view.toString())
-//            return true
-//        }
-//        return false
-//    }
+    fun updateGratitudeItem(gratitudeItem: GratitudeItem) {
+        Timber.d("Update item with id ${gratitudeItem.gratitudeItemId}")
+        viewModelScope.launch {
+            updateItem(gratitudeItem)
+        }
+
+    }
+
+
 
 }

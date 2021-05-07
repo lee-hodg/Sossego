@@ -35,6 +35,7 @@
             tools:srcCompat="@android:drawable/ic_delete" />
 
         <!--        2-way binding has @=-->
+        <!--            android:text="@={gratitudeItem.gratitudeText}"-->
         <EditText
             android:id="@+id/gratitude_item_text"
             android:layout_width="0dp"

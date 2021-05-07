@@ -51,7 +51,6 @@ dependencies {
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
 
 
-
     // Support libraries
     implementation "androidx.constraintlayout:constraintlayout:$version_constraint_layout"
 

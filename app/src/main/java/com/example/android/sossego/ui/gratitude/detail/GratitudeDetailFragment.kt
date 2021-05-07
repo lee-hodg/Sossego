@@ -8,6 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.database.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeDetailBinding
@@ -67,9 +69,14 @@ class GratitudeDetailFragment : Fragment() {
         })
 
         // Build an adapter for our recyclerview.
-        val gratitudeDetailAdapter = GratitudeDetailAdapter(GratitudeItemListener { gratitudeItemId ->
-            gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItemId)
-        })
+        val gratitudeDetailAdapter = GratitudeDetailAdapter(
+            GratitudeItemListener { gratitudeItemId ->
+            gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItemId)},
+            GratitudeItemTextChangedListener({gratitudeItem ->
+                gratitudeDetailViewModel.updateGratitudeItem(gratitudeItem)},
+                {gratitudeItem ->
+                gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItem.gratitudeItemId)})
+        )
 
         // We observe the gratitudeLists liveData of the view model. If it changes we must
         // rebuild the recycler view with submitList
@@ -81,6 +88,17 @@ class GratitudeDetailFragment : Fragment() {
 
         // Set our recyclerview to use this adapter
         binding.gratitudeDetailRecycler.adapter = gratitudeDetailAdapter
+
+        // Swipe to delete action
+        val swipeHandler = object : SwipeToDeleteCallback(this.requireContext()) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val currentItemId = gratitudeDetailAdapter.currentList[viewHolder.adapterPosition]
+                    .gratitudeItem.gratitudeItemId
+                gratitudeDetailViewModel.deleteGratitudeItem(currentItemId)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(binding.gratitudeDetailRecycler)
 
         return binding.root
     }
