@@ -1,9 +1,9 @@
 package com.example.android.sossego.ui.gratitude.detail
 
 import androidx.lifecycle.*
-import com.example.android.sossego.database.GratitudeDatabaseDao
-import com.example.android.sossego.database.GratitudeItem
-import com.example.android.sossego.database.GratitudeList
+import com.example.android.sossego.database.gratitude.GratitudeDatabaseDao
+import com.example.android.sossego.database.gratitude.GratitudeItem
+import com.example.android.sossego.database.gratitude.GratitudeList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -11,7 +11,8 @@ import timber.log.Timber
 
 class GratitudeDetailViewModel (
     private val gratitudeListKey: Long = 0L,
-    val database: GratitudeDatabaseDao) : ViewModel() {
+    val database: GratitudeDatabaseDao
+) : ViewModel() {
 
     val gratitudeList:  LiveData<GratitudeList?>
 

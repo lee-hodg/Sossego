@@ -7,30 +7,30 @@
     <data>
 
         <variable
-            name="gratitudeList"
-            type="com.example.android.sossego.database.gratitude.GratitudeList" />
+            name="journalEntry"
+            type="com.example.android.sossego.database.journal.JournalEntry" />
 
         <variable
             name="clickListener"
-            type="com.example.android.sossego.ui.gratitude.listing.GratitudeListListener" />
+            type="com.example.android.sossego.ui.journal.listing.JournalEntryListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:onClick="@{() -> clickListener.onClick(gratitudeList)}">
+        android:onClick="@{() -> clickListener.onClick(journalEntry)}">
 
         <ImageView
-            android:id="@+id/prayer_image"
+            android:id="@+id/writing_image"
             android:layout_width="@dimen/icon_size"
             android:layout_height="60dp"
             android:background="@color/white"
+            android:contentDescription="@string/journal_list_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_pray"
-            tools:srcCompat="@drawable/ic_pray"
-            android:contentDescription="@string/gratitude_list_image" />
+            app:srcCompat="@android:drawable/ic_menu_edit"
+            tools:srcCompat="@android:drawable/ic_menu_edit" />
 
         <TextView
             android:id="@+id/list_creation_date"
@@ -39,10 +39,10 @@
             android:layout_marginStart="@dimen/margin"
             android:layout_marginEnd="@dimen/margin"
             android:textStyle="bold"
-            app:gratitudeListCreatedDate="@{gratitudeList}"
+            app:journalEntryCreatedDate="@{journalEntry}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/prayer_image"
-            app:layout_constraintTop_toTopOf="@+id/prayer_image"
+            app:layout_constraintStart_toEndOf="@+id/writing_image"
+            app:layout_constraintTop_toTopOf="@+id/writing_image"
             tools:text="Friday May-05-2021 15:45" />
 
         <TextView
@@ -52,10 +52,11 @@
             android:layout_marginStart="@dimen/margin"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="@dimen/margin"
+            app:journalEntrySmartTruncate="@{journalEntry}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/prayer_image"
+            app:layout_constraintStart_toEndOf="@+id/writing_image"
             app:layout_constraintTop_toBottomOf="@+id/list_creation_date"
-            tools:text="Items: 10" />
+            tools:text="I had a good day..." />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

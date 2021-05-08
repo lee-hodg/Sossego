@@ -1,15 +1,10 @@
 package com.example.android.sossego.ui.gratitude
 
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.KeyEvent
-import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.example.android.sossego.convertLongToDateString
-import com.example.android.sossego.database.GratitudeItem
-import com.example.android.sossego.database.GratitudeList
+import com.example.android.sossego.database.gratitude.GratitudeList
+import com.example.android.sossego.database.journal.JournalEntry
 import timber.log.Timber
 
 
@@ -37,7 +32,6 @@ fun TextView.setGratitudeListCreatedDate(item: GratitudeList?) {
         text = convertLongToDateString(item.createdDate)
     }
 }
-
 
 //@BindingAdapter("gratitudeTextChangedListener")
 //fun TextView.setGratitudeTextChangedListener(item: GratitudeItem?) {

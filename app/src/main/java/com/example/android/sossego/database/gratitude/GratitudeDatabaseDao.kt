@@ -1,7 +1,6 @@
-package com.example.android.sossego.database
+package com.example.android.sossego.database.gratitude
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
 @Dao

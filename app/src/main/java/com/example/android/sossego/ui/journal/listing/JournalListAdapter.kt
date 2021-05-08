@@ -1,6 +1,6 @@
-package com.example.android.sossego.ui.gratitude.listing
+package com.example.android.sossego.ui.journal.listing
 
-import com.example.android.sossego.database.gratitude.GratitudeList
+import com.example.android.sossego.database.journal.JournalEntry
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.convertTimestampToMonthYear
-import com.example.android.sossego.databinding.ListItemGratitudeBinding
+import com.example.android.sossego.databinding.JournalEntryListingItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,12 +22,12 @@ private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
 
 
-class GratitudeListAdapter(private val clickListener: GratitudeListListener) : ListAdapter<DataItem,
-        RecyclerView.ViewHolder>(GratitudeListDiffCallback()) {
+class JournalEntryListAdapter(private val clickListener: JournalEntryListener) : ListAdapter<DataItem,
+        RecyclerView.ViewHolder>(JournalEntryDiffCallback()) {
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
-    fun submitGratitudeList(list: List<GratitudeList>?) {
+    fun submitJournalEntryList(list: List<JournalEntry>?) {
         adapterScope.launch {
 
             val listItems : MutableList<DataItem> = ArrayList()
@@ -38,7 +38,7 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
                     currentMonthYear = monthYear
                     listItems.add(DataItem.Header(monthYear))
                 }
-                listItems.add(DataItem.GratitudeListItem(it))
+                listItems.add(DataItem.JournalEntryItem(it))
             }
 
             withContext(Dispatchers.Main) {
@@ -56,15 +56,15 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is DataItem.Header -> ITEM_VIEW_TYPE_HEADER
-            is DataItem.GratitudeListItem -> ITEM_VIEW_TYPE_ITEM
+            is DataItem.JournalEntryItem -> ITEM_VIEW_TYPE_ITEM
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ViewHolder -> {
-                val gratitudeListItem = getItem(position) as DataItem.GratitudeListItem
-                holder.bind(clickListener, gratitudeListItem.gratitudeList)
+                val journalEntryItem = getItem(position) as DataItem.JournalEntryItem
+                holder.bind(clickListener, journalEntryItem.journalEntry)
             }
             is HeaderViewHolder -> {
                 val headerItem = getItem(position) as DataItem.Header
@@ -98,14 +98,12 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
         }
     }
 
-    class ViewHolder private constructor(private val binding: ListItemGratitudeBinding)
+    class ViewHolder private constructor(private val binding: JournalEntryListingItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(clickListener: GratitudeListListener, item: GratitudeList) {
-            binding.gratitudeList = item
+        fun bind(clickListener: JournalEntryListener, item: JournalEntry) {
+            binding.journalEntry = item
             binding.clickListener = clickListener
-            binding.listElementCount.text = this.itemView.resources.getString(
-                    R.string.item_count_template, item.elementCount)
             binding.executePendingBindings()
 
         }
@@ -113,8 +111,8 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ListItemGratitudeBinding.inflate(layoutInflater, parent,
-                        false)
+                val binding = JournalEntryListingItemBinding.inflate(layoutInflater, parent,
+                    false)
                 return ViewHolder(binding)
             }
         }
@@ -127,7 +125,7 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
  * Used by ListAdapter to calculate the minimum number of changes between and old list and a new
  * list that's been passed to `submitList`.
  */
-class GratitudeListDiffCallback : DiffUtil.ItemCallback<DataItem>() {
+class JournalEntryDiffCallback : DiffUtil.ItemCallback<DataItem>() {
     override fun areItemsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
         return oldItem.id == newItem.id
     }
@@ -137,20 +135,18 @@ class GratitudeListDiffCallback : DiffUtil.ItemCallback<DataItem>() {
     }
 }
 
-class GratitudeListListener(val clickListener: (gratitudeListId: Long) -> Unit) {
-    fun onClick(gratitudeList: GratitudeList) = clickListener(gratitudeList.gratitudeListId)
+class JournalEntryListener(val clickListener: (journalEntryId: Long) -> Unit) {
+    fun onClick(journalEntry: JournalEntry) = clickListener(journalEntry.journalEntryId)
 }
 
 
 sealed class DataItem {
     abstract val id: Long
 
-    data class GratitudeListItem(val gratitudeList: GratitudeList): DataItem() {
-        override val id = gratitudeList.gratitudeListId
+    data class JournalEntryItem(val journalEntry: JournalEntry): DataItem() {
+        override val id = journalEntry.journalEntryId
     }
 
-    // this would make Header a singleton? only ever one header, which is not what I'll need
-    // prob I just want a second Header data class?
     data class Header(val monthYear: String): DataItem() {
         override val id = Long.MIN_VALUE
     }

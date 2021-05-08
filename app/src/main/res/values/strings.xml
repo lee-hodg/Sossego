@@ -11,4 +11,9 @@
     <string name="save_button_text">Save</string>
     <string name="delete_button_text">Delete</string>
     <string name="clear_button_text">Clear</string>
+    <string name="gratitude_list_image">Gratitude list image</string>
+    <string name="title_journal">Journal</string>
+    <string name="journal_entry_hint">Keep a diary and someday it will keep you...</string>
+    <string name="journal_list_image">Image of a journal</string>
+    <string name="add_journal_entry_fab_content_description">Add a new journal entry</string>
 </resources>

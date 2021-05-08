@@ -34,17 +34,42 @@
     </fragment>
 
 
-
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.example.android.sossego.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_journal"
+        android:name="com.example.android.sossego.ui.journal.listing.JournalListingFragment"
+        android:label="@string/title_journal"
+        tools:layout="@layout/fragment_journal_listing" >
+        <action
+            android:id="@+id/action_navigation_journal_to_journalEntryDetailFragment"
+            app:destination="@id/journalEntryDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popUpTo="@id/navigation_journal"
+            app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/journalEntryDetailFragment"
+        android:name="com.example.android.sossego.ui.journal.detail.JournalEntryDetailFragment"
+        android:label="JournalEntryDetailFragment" >
+        <argument
+            android:name="journalEntryIdKey"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_journalEntryDetailFragment2_to_navigation_journal"
+            app:destination="@id/navigation_journal"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popUpTo="@id/journalEntryDetailFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.android.sossego.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
 
 </navigation>

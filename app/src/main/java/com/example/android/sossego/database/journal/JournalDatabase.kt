@@ -1,4 +1,4 @@
-package com.example.android.sossego.database
+package com.example.android.sossego.database.journal
 
 import android.content.Context
 import androidx.room.Database
@@ -7,20 +7,20 @@ import androidx.room.RoomDatabase
 
 
 /**
- * A database that stores GratitudeList, GratitudeItem information.
+ * A database that stores JournalEntry data.
  * And a global method to get access to the database.
  *
  * This pattern is pretty much the same for any database,
  * so you can reuse it.
  */
-@Database(entities = [GratitudeList::class, GratitudeItem::class], version = 2,
+@Database(entities = [JournalEntry::class], version = 1,
     exportSchema = false)
-abstract class GratitudeDatabase : RoomDatabase() {
+abstract class JournalDatabase : RoomDatabase() {
 
     /**
      * Connects the database to the DAO.
      */
-    abstract val gratitudeDatabaseDao: GratitudeDatabaseDao
+    abstract val journalDatabaseDao: JournalDatabaseDao
 
     /**
      * Define a companion object, this allows us to add functions on the class.
@@ -39,7 +39,7 @@ abstract class GratitudeDatabase : RoomDatabase() {
          *  thread to shared data are visible to other threads.
          */
         @Volatile
-        private var INSTANCE: GratitudeDatabase? = null
+        private var INSTANCE: JournalDatabase? = null
 
         /**
          * Helper function to get the database.
@@ -58,7 +58,7 @@ abstract class GratitudeDatabase : RoomDatabase() {
          *
          * @param context The application context Singleton, used to get access to the filesystem.
          */
-        fun getInstance(context: Context): GratitudeDatabase {
+        fun getInstance(context: Context): JournalDatabase {
             // Multiple threads can ask for the database at the same time, ensure we only initialize
             // it once by using synchronized. Only one thread may enter a synchronized block at a
             // time.
@@ -70,15 +70,15 @@ abstract class GratitudeDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        GratitudeDatabase::class.java,
-                        "gratitude_database"
+                        JournalDatabase::class.java,
+                        "journal_entry_database"
                     )
-                    // Wipes and rebuilds instead of migrating if no Migration object.
-                    // Migration is not part of this lesson. You can learn more about
-                    // migration with Room in this blog post:
-                    // https://medium.com/androiddevelopers/understanding-migrations-with-room-f01e04b07929
-                    .fallbackToDestructiveMigration()
-                    .build()
+                        // Wipes and rebuilds instead of migrating if no Migration object.
+                        // Migration is not part of this lesson. You can learn more about
+                        // migration with Room in this blog post:
+                        // https://medium.com/androiddevelopers/understanding-migrations-with-room-f01e04b07929
+                        .fallbackToDestructiveMigration()
+                        .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance
                 }

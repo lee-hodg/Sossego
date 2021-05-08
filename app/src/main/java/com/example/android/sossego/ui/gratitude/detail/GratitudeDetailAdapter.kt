@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.sossego.database.GratitudeItem
+import com.example.android.sossego.database.gratitude.GratitudeItem
 import com.example.android.sossego.databinding.DetailGratitudeItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +63,8 @@ class GratitudeDetailAdapter(private val deleteClickListener: GratitudeItemListe
 
         fun bind(deleteClickListener: GratitudeItemListener,
                  textChangedListener: GratitudeItemTextChangedListener,
-                 item: GratitudeItem) {
+                 item: GratitudeItem
+        ) {
             binding.gratitudeItem = item
             binding.clickListener = deleteClickListener
             binding.gratitudeItemText.onFocusChangeListener  =

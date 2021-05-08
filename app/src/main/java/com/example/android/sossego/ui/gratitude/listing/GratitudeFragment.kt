@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
-import com.example.android.sossego.database.GratitudeDatabase
+import com.example.android.sossego.database.gratitude.GratitudeDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
 import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
 

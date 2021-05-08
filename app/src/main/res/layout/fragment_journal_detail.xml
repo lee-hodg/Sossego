@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Wrapping the layout into /layout to make it available with data binding. -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Data to make available to the XML via data binding. In this case,
+     the whole ViewModel, so that we can access the LiveData,
+     click handlers, and state variables. -->
+    <data>
+
+        <variable
+            name="journalEntryDetailViewModel"
+            type="com.example.android.sossego.ui.journal.detail.JournalEntryDetailViewModel" />
+    </data>
+
+    <!-- Start of the visible fragment layout using ConstraintLayout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.JournalEntryDetailFragment">
+
+
+        <!--        2-way binding has @=-->
+        <EditText
+            android:id="@+id/journal_entry_edit_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:background="#EFECEC"
+            android:gravity="top"
+            android:hint="@string/journal_entry_hint"
+            android:inputType="textMultiLine"
+            android:padding="@dimen/padding_small"
+            android:text="@={journalEntryDetailViewModel.journalEntry.entryText}"
+            android:textAlignment="inherit"
+            app:layout_constraintBottom_toTopOf="@+id/journal_entry_detail_save_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+<!--        -->
+
+        <Button
+            android:id="@+id/journal_entry_detail_save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save_button_text"
+            android:onClick="@{() -> journalEntryDetailViewModel.saveJournalEntry()}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/journal_entry_detail_delete_btn"
+            app:layout_constraintEnd_toStartOf="@+id/journal_entry_detail_delete_btn"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <Button
+            android:id="@+id/journal_entry_detail_delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginBottom="@dimen/margin"
+            android:text="@string/delete_button_text"
+            android:onClick="@{() -> journalEntryDetailViewModel.deleteJournalEntry()}"
+            app:backgroundTint="#D12626"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/journal_entry_detail_save_button"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

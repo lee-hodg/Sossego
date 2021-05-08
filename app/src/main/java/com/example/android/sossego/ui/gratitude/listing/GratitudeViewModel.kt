@@ -2,8 +2,8 @@ package com.example.android.sossego.ui.gratitude.listing
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.example.android.sossego.database.GratitudeDatabaseDao
-import com.example.android.sossego.database.GratitudeList
+import com.example.android.sossego.database.gratitude.GratitudeDatabaseDao
+import com.example.android.sossego.database.gratitude.GratitudeList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

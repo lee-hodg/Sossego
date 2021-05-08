@@ -1,4 +1,4 @@
-package com.example.android.sossego.database
+package com.example.android.sossego.database.gratitude
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

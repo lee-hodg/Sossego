@@ -4,6 +4,9 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.android.sossego.database.*
+import com.example.android.sossego.database.gratitude.GratitudeDatabase
+import com.example.android.sossego.database.gratitude.GratitudeDatabaseDao
+import com.example.android.sossego.database.gratitude.GratitudeItem
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
