@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -32,6 +33,8 @@ class GratitudeDetailFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
+
+        (activity as AppCompatActivity).supportActionBar?.title = "Edit Gratitude List"
 
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentGratitudeDetailBinding = DataBindingUtil.inflate(
