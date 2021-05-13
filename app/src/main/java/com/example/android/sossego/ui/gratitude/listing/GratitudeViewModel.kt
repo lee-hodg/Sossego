@@ -19,17 +19,17 @@ class GratitudeViewModel(
               Navigation from list to detail
      **/
     /**
-     * Variable that tells the Fragment to navigate to a specific [GratitudeListDetailFragment]
+     * Variable that tells the Fragment to navigate to a specific [GratitudeFragment]
      * This is private because we don't want to expose setting this value to the Fragment.
      */
     private val _navigateToGratitudeListDetail = MutableLiveData<Long?>()
     /**
-     * If this is non-null, immediately navigate to [GratitudeListDetailFragment] and call [doneNavigating]
+     * If this is non-null, immediately navigate to [GratitudeFragment] and call [doneNavigating]
      */
     val navigateToGratitudeListDetail
         get() = _navigateToGratitudeListDetail
     /**
-     * Call this immediately after navigating to [GratitudeListDetailFragment]
+     * Call this immediately after navigating to [GratitudeFragment]
      * It will clear the navigation request, so if the user rotates their phone it won't navigate
      * twice.
      */
