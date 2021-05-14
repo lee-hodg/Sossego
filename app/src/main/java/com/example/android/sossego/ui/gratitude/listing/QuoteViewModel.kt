@@ -15,6 +15,10 @@ class QuotesViewModel(
     private val quotesRepository = QuotesRepository(database)
 
     init {
+        // Note: this won't scale with many users since each would be hitting the API
+        // at least once per day perhaps. Not sure if will be an issue, but if it is
+        // then we'd have a server worker do it once, and then each client makes the request
+        // to backend Sossego server once per day instead
         viewModelScope.launch {
             quotesRepository.refreshQuotes()
         }
