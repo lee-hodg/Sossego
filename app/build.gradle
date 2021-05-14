@@ -12,6 +12,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.example.android.sossego"
         minSdkVersion 19
         targetSdkVersion 30
@@ -40,6 +41,8 @@ android {
     buildFeatures {
         dataBinding true
     }
+
+
 }
 
 dependencies {
@@ -79,7 +82,24 @@ dependencies {
     // Logging
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
+    // Retrofit with Moshi Converter
+    implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
+
+    // Moshi for parsing the JSON format
+    implementation "com.squareup.moshi:moshi:$version_moshi"
+    implementation "com.squareup.moshi:moshi-kotlin:$version_moshi"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
+    implementation "com.squareup.retrofit2:converter-scalars:$version_retrofit"
+
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    implementation "android.arch.work:work-runtime-ktx:$version_work"
+
+
 }

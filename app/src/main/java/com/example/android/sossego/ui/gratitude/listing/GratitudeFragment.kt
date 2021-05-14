@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.database.gratitude.GratitudeDatabase
+import com.example.android.sossego.database.quotes.database.QuoteDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
 import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
 
@@ -21,6 +22,8 @@ import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
  * in a recyclerview.
  */
 class GratitudeFragment : Fragment() {
+
+
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -96,6 +99,15 @@ class GratitudeFragment : Fragment() {
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(binding.gratitudeListRecycler)
+
+        // The Quote viewmodel too
+        val quoteDatabase = QuoteDatabase.getInstance(application)
+        val quoteViewModelFactory = QuotesViewModel.Factory(quoteDatabase, application)
+
+        val quoteViewModel = ViewModelProvider(
+            this, quoteViewModelFactory).get(QuotesViewModel::class.java)
+
+        binding.quoteViewModel = quoteViewModel
 
         return binding.root
     }

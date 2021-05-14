@@ -1,10 +1,13 @@
 package com.example.android.sossego.ui.gratitude
 
+import android.provider.Settings.Global.getString
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.example.android.sossego.R
 import com.example.android.sossego.convertLongToDateString
 import com.example.android.sossego.database.gratitude.GratitudeList
 import com.example.android.sossego.database.journal.JournalEntry
+import com.example.android.sossego.database.quotes.domain.Quote
 import timber.log.Timber
 
 
@@ -32,6 +35,14 @@ fun TextView.setGratitudeListCreatedDate(item: GratitudeList?) {
         text = convertLongToDateString(item.createdDate)
     }
 }
+
+@BindingAdapter("formatQuote")
+fun TextView.setQuote(item: Quote?) {
+    item?.let {
+        text = "\"" + item.quoteText + "\"" + " - " + item.author
+    }
+}
+
 
 //@BindingAdapter("gratitudeTextChangedListener")
 //fun TextView.setGratitudeTextChangedListener(item: GratitudeItem?) {

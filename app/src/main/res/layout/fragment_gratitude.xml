@@ -8,16 +8,35 @@
      the whole ViewModel, so that we can access the LiveData,
      click handlers, and state variables. -->
     <data>
-
         <variable
             name="gratitudeViewModel"
             type="com.example.android.sossego.ui.gratitude.listing.GratitudeViewModel" />
+        <variable
+            name="quoteViewModel"
+            type="com.example.android.sossego.ui.gratitude.listing.QuotesViewModel" />
     </data>
 
     <!-- Start of the visible fragment layout using ConstraintLayout -->
     <androidx.constraintlayout.widget.ConstraintLayout  android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.gratitude.listing.GratitudeFragment">
+
+        <TextView
+            android:id="@+id/quote_of_the_day_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginEnd="16dp"
+            android:background="#EFECEC"
+            android:padding="@dimen/padding_small"
+            app:formatQuote="@{quoteViewModel.quotes[0]}"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toTopOf="@+id/gratitude_list_recycler"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="A bird in the hand is worth two in the bush" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/gratitude_list_recycler"
@@ -31,7 +50,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/quote_of_the_day_text" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingActionButton"
@@ -45,6 +64,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_menu_add" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
