@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id 'kotlin-android-extensions'
     id 'androidx.navigation.safeargs'
+    id 'com.google.gms.google-services'
 
 }
 
@@ -101,5 +102,16 @@ dependencies {
 
     implementation "android.arch.work:work-runtime-ktx:$version_work"
 
+    implementation platform("com.google.firebase:firebase-bom:$version_firebase")
 
+    // Declare the dependency for the Realtime Database library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-database-ktx'
+    // FirebaseUI for Firebase Realtime Database
+    implementation "com.firebaseui:firebase-ui-database:$version_firebase_ui"
+
+    // Koin for Kotlin apps (dependency injection, cf dagger java)
+
+    implementation "org.koin:koin-android:$version_koin"
+    implementation "org.koin:koin-android-viewmodel:$version_koin"
 }

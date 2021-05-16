@@ -2,18 +2,23 @@ package com.example.android.sossego.ui.gratitude.listing
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.GratitudeDatabaseDao
-import com.example.android.sossego.database.gratitude.GratitudeList
+import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class GratitudeViewModel(
     val database: GratitudeDatabaseDao,
+    private val gratitudeRepository: GratitudeRepository,
     application: Application
 ) : AndroidViewModel(application) {
 
-    val gratitudeLists = database.getAllGratitudeListsWithElementCount()
 
     /**
               Navigation from list to detail
@@ -22,7 +27,7 @@ class GratitudeViewModel(
      * Variable that tells the Fragment to navigate to a specific [GratitudeFragment]
      * This is private because we don't want to expose setting this value to the Fragment.
      */
-    private val _navigateToGratitudeListDetail = MutableLiveData<Long?>()
+    private val _navigateToGratitudeListDetail = MutableLiveData<String?>()
     /**
      * If this is non-null, immediately navigate to [GratitudeFragment] and call [doneNavigating]
      */
@@ -37,34 +42,34 @@ class GratitudeViewModel(
         _navigateToGratitudeListDetail.value = null
     }
 
-    fun onGratitudeListClicked(gratitudeListId: Long) {
+    fun onGratitudeListClicked(gratitudeListId: String) {
         _navigateToGratitudeListDetail.value = gratitudeListId
     }
 
-    private suspend fun insert(gratitudeList: GratitudeList) {
+    private suspend fun insert(): String? {
+        val gratitudeListId: String?
         withContext(Dispatchers.IO) {
-            database.insert(gratitudeList)
+            gratitudeListId = gratitudeRepository.createGratitudeList()
         }
+        return gratitudeListId
     }
 
     fun addNewGratitudeList(){
         viewModelScope.launch {
 
-            val newGratitudeList = GratitudeList()
+            val gratitudeListKey = insert()
 
-            insert(newGratitudeList)
-
-            _navigateToGratitudeListDetail.value  = database.getLatestGratitudeList()?.gratitudeListId
+            _navigateToGratitudeListDetail.value = gratitudeListKey
         }
     }
 
-    private suspend fun delete(gratitudeListId: Long) {
+    private suspend fun delete(gratitudeListId: String) {
         withContext(Dispatchers.IO) {
-            database.deleteGratitudeList(gratitudeListId)
+            gratitudeRepository.removeGratitudeList(gratitudeListId)
         }
     }
 
-    fun deleteGratitudeList(gratitudeListId: Long){
+    fun deleteGratitudeList(gratitudeListId: String){
         viewModelScope.launch {
 
             delete(gratitudeListId)

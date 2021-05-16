@@ -30,7 +30,7 @@
             android:layout_marginEnd="16dp"
             android:background="#EFECEC"
             android:padding="@dimen/padding_small"
-            app:formatQuote="@{quoteViewModel.quotes[0]}"
+            app:formatQuote="@{quoteViewModel.latestQuote}"
             android:textStyle="italic"
             app:layout_constraintBottom_toTopOf="@+id/gratitude_list_recycler"
             app:layout_constraintEnd_toEndOf="parent"

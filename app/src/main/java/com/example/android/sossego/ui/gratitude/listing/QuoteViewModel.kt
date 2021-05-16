@@ -24,7 +24,7 @@ class QuotesViewModel(
         }
     }
 
-    val quotes = quotesRepository.quotes
+    val latestQuote = quotesRepository.latestQuote
 
     /**
      * Factory for constructing QuotesViewModel with parameters

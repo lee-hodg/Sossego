@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.sossego.database.gratitude.GratitudeItem
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeItem
 import com.example.android.sossego.databinding.DetailGratitudeItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +28,7 @@ class GratitudeDetailAdapter(private val deleteClickListener: GratitudeItemListe
      * This will be a list of gratitude list items for a given gratitude list.
      * We wrap them in the dataclass and we offload the work with a co-routine
      */
-    fun submitGratitudeItemList(list: List<GratitudeItem>?) {
+    fun submitGratitudeItemList(list: List<FirebaseGratitudeItem>?) {
         adapterScope.launch {
             val items = list?.map { GratitudeDataItem(it) }
 
@@ -63,7 +63,7 @@ class GratitudeDetailAdapter(private val deleteClickListener: GratitudeItemListe
 
         fun bind(deleteClickListener: GratitudeItemListener,
                  textChangedListener: GratitudeItemTextChangedListener,
-                 item: GratitudeItem
+                 item: FirebaseGratitudeItem
         ) {
             binding.gratitudeItem = item
             binding.clickListener = deleteClickListener
@@ -93,15 +93,15 @@ class GratitudeDetailAdapter(private val deleteClickListener: GratitudeItemListe
  * and this is defined in the viewmodel
  */
 
-class GratitudeItemListener(val clickListener: (gratitudeListId: Long) -> Unit) {
-    fun onClick(gratitudeItem: GratitudeItem) = clickListener(gratitudeItem.gratitudeItemId)
+class GratitudeItemListener(val clickListener: (gratitudeListId: String) -> Unit) {
+    fun onClick(gratitudeItem: FirebaseGratitudeItem) = clickListener(gratitudeItem.gratitudeItemId)
 }
 
 class GratitudeItemTextChangedListener(
-    private val textChangedCallback: (gratitudeItem: GratitudeItem) -> Unit,
-    private val textErasedCallback: (gratitudeItem: GratitudeItem) -> Unit) {
+    private val textChangedCallback: (gratitudeItem: FirebaseGratitudeItem) -> Unit,
+    private val textErasedCallback: (gratitudeItem: FirebaseGratitudeItem) -> Unit) {
 
-    fun onFocusChangeListener(item: GratitudeItem) = View.OnFocusChangeListener { _, hasFocus ->
+    fun onFocusChangeListener(item: FirebaseGratitudeItem) = View.OnFocusChangeListener { _, hasFocus ->
         if (!hasFocus) {
             // Do something when edit text lost focus
             // (this includes Enter, clicking away and navigating back)
@@ -140,6 +140,6 @@ class GratitudeItemDiffCallback : DiffUtil.ItemCallback<GratitudeDataItem>() {
  * Although the GratitudeItem is itself a data class here, so it's not strictly needed for that.
  * Notice we copy the id field to `id` on the dataclass, so areItemsTheSame is quite generic
  */
-data class GratitudeDataItem(val gratitudeItem: GratitudeItem) {
+data class GratitudeDataItem(val gratitudeItem: FirebaseGratitudeItem) {
     val id = gratitudeItem.gratitudeItemId
 }

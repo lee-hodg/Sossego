@@ -1,12 +1,9 @@
 package com.example.android.sossego.ui.gratitude
 
-import android.provider.Settings.Global.getString
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.example.android.sossego.R
 import com.example.android.sossego.convertLongToDateString
-import com.example.android.sossego.database.gratitude.GratitudeList
-import com.example.android.sossego.database.journal.JournalEntry
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.quotes.domain.Quote
 import timber.log.Timber
 
@@ -14,23 +11,23 @@ import timber.log.Timber
 /**
  * Returns a string representing the numeric quality rating.
  */
-fun convertNumericQualityToString(num: Long): String {
-    return num.toString()
-}
+//fun convertNumericQualityToString(num: Long): String {
+//    return num.toString()
+//}
 
 
 
 @BindingAdapter("gratitudeListIdString")
-fun TextView.setGratitudeListIdString(item: GratitudeList?) {
+fun TextView.setGratitudeListIdString(item: FirebaseGratitudeList?) {
     Timber.d("setGratitudeListIdString binding adapter got item ${item?.gratitudeListId}")
     item?.let {
-        text = convertNumericQualityToString(item.gratitudeListId)
+        item.gratitudeListId.also { text = it }
     }
 }
 
 
 @BindingAdapter("gratitudeListCreatedDate")
-fun TextView.setGratitudeListCreatedDate(item: GratitudeList?) {
+fun TextView.setGratitudeListCreatedDate(item: FirebaseGratitudeList?) {
     item?.let {
         text = convertLongToDateString(item.createdDate)
     }

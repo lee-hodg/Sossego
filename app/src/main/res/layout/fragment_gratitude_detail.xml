@@ -21,6 +21,8 @@
         android:layout_height="match_parent"
         tools:context=".ui.GratitudeDetailFragment">
 
+        <!--            app:gratitudeListCreatedDate="@{gratitudeDetailViewModel.gratitudeList}"-->
+
         <TextView
             android:id="@+id/detail_creation_date"
             android:layout_width="0dp"
@@ -28,7 +30,6 @@
             android:layout_marginStart="@dimen/margin"
             android:layout_marginTop="16dp"
             android:textStyle="bold"
-            app:gratitudeListCreatedDate="@{gratitudeDetailViewModel.gratitudeList}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

@@ -8,11 +8,15 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.work.*
+import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.quotes.work.RefreshDataWorker
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.util.concurrent.TimeUnit
@@ -22,6 +26,22 @@ class MainActivity : AppCompatActivity() {
 
     private val applicationScope = CoroutineScope(Dispatchers.Default)
 
+
+    private fun initKoin() {
+        val myModule = module {
+            single {
+                GratitudeRepository.getInstance()
+            }
+
+        }
+        // start Koin!
+        startKoin {
+            // declare used Android context
+            androidContext(applicationContext)
+            // declare modules
+            modules(myModule)
+        }
+    }
 
     private fun delayedInit() {
         applicationScope.launch {
@@ -73,6 +93,8 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         delayedInit()
+
+        initKoin()
 
     }
 

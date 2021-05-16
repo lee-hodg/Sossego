@@ -13,19 +13,29 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.GratitudeDatabase
+import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.databinding.FragmentGratitudeDetailBinding
 import com.example.android.sossego.hideKeyboard
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
+import org.koin.android.ext.android.inject
+import org.koin.core.KoinComponent
 import timber.log.Timber
+import java.util.*
 
 
-class GratitudeDetailFragment : Fragment() {
+class GratitudeDetailFragment : Fragment(), KoinComponent {
 
     /**
      * Called when the Fragment is ready to display content to the screen.
      *
      * This function uses DataBindingUtil to inflate R.layout.fragment_sleep_quality.
      */
+    private val gratitudeRepository: GratitudeRepository by inject()
 
     companion object{
         private const val TAG = "GratitudeDetailFragment"
@@ -48,7 +58,8 @@ class GratitudeDetailFragment : Fragment() {
 
         // Create an instance of the ViewModel Factory.
         val dataSource = GratitudeDatabase.getInstance(application).gratitudeDatabaseDao
-        val viewModelFactory = GratitudeDetailViewModelFactory(arguments.gratitudeListIdKey, dataSource)
+        val viewModelFactory = GratitudeDetailViewModelFactory(arguments.gratitudeListIdKey,
+            dataSource, gratitudeRepository)
         // Get a reference to the ViewModel associated with this fragment.
         val gratitudeDetailViewModel =
             ViewModelProvider(
@@ -76,20 +87,48 @@ class GratitudeDetailFragment : Fragment() {
         // Build an adapter for our recyclerview.
         val gratitudeDetailAdapter = GratitudeDetailAdapter(
             GratitudeItemListener { gratitudeItemId ->
-            gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItemId)},
+                gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItemId)},
             GratitudeItemTextChangedListener({gratitudeItem ->
                 gratitudeDetailViewModel.updateGratitudeItem(gratitudeItem)},
                 {gratitudeItem ->
-                gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItem.gratitudeItemId)})
+                    gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItem.gratitudeItemId)})
         )
+
+
+        /* Listen for changes in this particular gratitudeList that we are viewing the
+        detail for then update the ViewModel's gratitudeList variable
+         */
+        val gratitudeListDetailListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val gratitudeList = dataSnapshot.getValue<FirebaseGratitudeList>()
+                gratitudeDetailViewModel.gratitudeList = gratitudeList
+
+                // Update the items in recycler too
+                // ensure to submit the emptyList even if no items so clear works and delete
+                // of final item reflects in recycler
+                val itemsList = gratitudeList?.gratitudeItems?.values?.toList() ?: emptyList()
+
+                gratitudeDetailAdapter.submitGratitudeItemList(itemsList.sortedByDescending {
+                    it.createdDate })
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+                Timber.d("onCancelled called")
+            }
+        }
+        gratitudeRepository.addGratitudeListDetailValueEventListener(gratitudeListDetailListener,
+            arguments.gratitudeListIdKey)
+
+
 
         // We observe the gratitudeLists liveData of the view model. If it changes we must
         // rebuild the recycler view with submitList
-        gratitudeDetailViewModel.gratitudeItems.observe(viewLifecycleOwner, {
-            it?.let {
-                gratitudeDetailAdapter.submitGratitudeItemList(it)
-            }
-        })
+//        gratitudeDetailViewModel.gratitudeItems.observe(viewLifecycleOwner, {
+//            it?.let {
+//                gratitudeDetailAdapter.submitGratitudeItemList(it)
+//            }
+//        })
 
         // When enter is used to add a new gratitude item
         binding.newGratitudeItem.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->

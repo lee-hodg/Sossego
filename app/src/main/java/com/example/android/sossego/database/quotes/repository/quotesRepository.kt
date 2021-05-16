@@ -16,10 +16,16 @@ class QuotesRepository(private val database: QuoteDatabase) {
     /**
      * A list of Quote (domain model).
      */
-    val quotes: LiveData<List<Quote>> =
-        Transformations.map(database.quoteDatabaseDao.getAll()) {
+//    val quotes: LiveData<List<Quote>> =
+//        Transformations.map(database.quoteDatabaseDao.getAll()) {
+//            it.asDomainModel()
+//        }
+
+    val latestQuote: LiveData<Quote> =
+        Transformations.map(database.quoteDatabaseDao.getLatest()) {
             it.asDomainModel()
         }
+
 
     /**
      * Refresh the quotes stored in the offline cache.

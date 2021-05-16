@@ -8,7 +8,7 @@
 
         <variable
             name="gratitudeList"
-            type="com.example.android.sossego.database.gratitude.GratitudeList" />
+            type="com.example.android.sossego.database.gratitude.FirebaseGratitudeList" />
 
         <variable
             name="clickListener"

@@ -1,7 +1,5 @@
 package com.example.android.sossego.ui.gratitude.listing
 
-import com.example.android.sossego.database.gratitude.GratitudeList
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.convertTimestampToMonthYear
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.databinding.ListItemGratitudeBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,7 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
-    fun submitGratitudeList(list: List<GratitudeList>?) {
+    fun submitGratitudeList(list: MutableList<FirebaseGratitudeList>?) {
         adapterScope.launch {
 
             val listItems : MutableList<DataItem> = ArrayList()
@@ -101,11 +100,11 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
     class ViewHolder private constructor(private val binding: ListItemGratitudeBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(clickListener: GratitudeListListener, item: GratitudeList) {
+        fun bind(clickListener: GratitudeListListener, item: FirebaseGratitudeList) {
             binding.gratitudeList = item
             binding.clickListener = clickListener
             binding.listElementCount.text = this.itemView.resources.getString(
-                    R.string.item_count_template, item.elementCount)
+                    R.string.item_count_template, item.gratitudeItems?.size ?: 0)
             binding.executePendingBindings()
 
         }
@@ -137,22 +136,21 @@ class GratitudeListDiffCallback : DiffUtil.ItemCallback<DataItem>() {
     }
 }
 
-class GratitudeListListener(val clickListener: (gratitudeListId: Long) -> Unit) {
-    fun onClick(gratitudeList: GratitudeList) = clickListener(gratitudeList.gratitudeListId)
+class GratitudeListListener(val clickListener: (gratitudeListId: String) -> Unit) {
+    fun onClick(gratitudeList: FirebaseGratitudeList) = clickListener(gratitudeList.gratitudeListId)
 }
 
 
 sealed class DataItem {
-    abstract val id: Long
+    abstract val id: String?
 
-    data class GratitudeListItem(val gratitudeList: GratitudeList): DataItem() {
+    data class GratitudeListItem(val gratitudeList: FirebaseGratitudeList): DataItem() {
         override val id = gratitudeList.gratitudeListId
     }
 
-    // this would make Header a singleton? only ever one header, which is not what I'll need
-    // prob I just want a second Header data class?
+
     data class Header(val monthYear: String): DataItem() {
-        override val id = Long.MIN_VALUE
+        override val id: Nothing? = null
     }
 }
 

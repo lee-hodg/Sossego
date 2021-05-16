@@ -12,18 +12,27 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.GratitudeDatabase
+import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.quotes.database.QuoteDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
 import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
+import org.koin.android.ext.android.inject
+import org.koin.core.KoinComponent
+import timber.log.Timber
 
 /**
  * This is responsible for the listing of gratitude lists which will be displayed
  * in a recyclerview.
  */
-class GratitudeFragment : Fragment() {
+class GratitudeFragment : Fragment(), KoinComponent {
 
-
+    private val gratitudeRepository: GratitudeRepository by inject()
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -38,7 +47,8 @@ class GratitudeFragment : Fragment() {
         // Build view model with access to the database by using a factory
         val application = requireNotNull(this.activity).application
         val dataSource = GratitudeDatabase.getInstance(application).gratitudeDatabaseDao
-        val viewModelFactory = GratitudeViewModelFactory(dataSource, application)
+        val viewModelFactory = GratitudeViewModelFactory(dataSource,
+            gratitudeRepository, application)
         val gratitudeViewModel = ViewModelProvider(
                 this, viewModelFactory).get(GratitudeViewModel::class.java)
 
@@ -47,7 +57,7 @@ class GratitudeFragment : Fragment() {
         // for data-binding to work)
         binding.gratitudeViewModel = gratitudeViewModel
 
-        // Set this to be the lifecycle owern
+        // Set this to be the lifecycle owner
         binding.lifecycleOwner = this
 
         // Add an Observer on this variable to tell us when to navigate to the detail view
@@ -80,11 +90,40 @@ class GratitudeFragment : Fragment() {
 
         // We observe the gratitudeLists liveData of the view model. If it changes we must
         // rebuild the recycler view with submitList
-        gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, {
-            it?.let {
-                gratitudeListAdapter.submitGratitudeList(it)
+//        gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, {
+//            it?.let {
+//                gratitudeListAdapter.submitGratitudeList(it)
+//            }
+//        })
+
+        /**
+         * Can I somehow pass in the lambda? Confused
+         * Should I switch out to FIrebaseRecyclerView
+         * Sigh
+         */
+        val gratitudeListListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                // Figure out how this can be some function we pass in?
+                val listOfGratitudeLists : MutableList<FirebaseGratitudeList> = mutableListOf()
+
+                for(gratitudeList in dataSnapshot.children.reversed()) {
+                    val item = gratitudeList.getValue<FirebaseGratitudeList>()
+                    listOfGratitudeLists.add(item!!)
+                }
+
+
+                gratitudeListAdapter.submitGratitudeList(listOfGratitudeLists)
+
             }
-        })
+
+            override fun onCancelled(p0: DatabaseError) {
+                Timber.d("onCancelled called")
+            }
+        }
+
+        gratitudeRepository.addGratitudeListValueEventListener(gratitudeListListener)
+
 
         // Set our recyclerview to use this adapter
         binding.gratitudeListRecycler.adapter = gratitudeListAdapter

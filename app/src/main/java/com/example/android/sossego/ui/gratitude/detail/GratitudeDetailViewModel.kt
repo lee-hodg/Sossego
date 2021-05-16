@@ -1,43 +1,29 @@
 package com.example.android.sossego.ui.gratitude.detail
 
 import androidx.lifecycle.*
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeItem
+import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.GratitudeDatabaseDao
-import com.example.android.sossego.database.gratitude.GratitudeItem
-import com.example.android.sossego.database.gratitude.GratitudeList
+import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class GratitudeDetailViewModel (
-    private val gratitudeListKey: Long = 0L,
-    val database: GratitudeDatabaseDao
-) : ViewModel() {
+    private val gratitudeListKey: String,
+    val database: GratitudeDatabaseDao,
+    private val gratitudeRepository: GratitudeRepository
+    ) : ViewModel() {
 
-    val gratitudeList:  LiveData<GratitudeList?>
+    var gratitudeList: FirebaseGratitudeList? = null
 
-    var gratitudeItems: LiveData<List<GratitudeItem>>
-
-//    var gratitudeItems = MediatorLiveData<List<GratitudeItem>>()
-//        set(value) {
-//            field = value
-//            Timber.d("Setting gratitudeItems value $value")
-//        }
 
     // Initial value of EditText for new gratitude items being added
     val newGratitudeItemText = MutableLiveData<String?>()
 
-    // fun getGratitudeList() = gratitudeList
-
     init {
         Timber.d("GratitudeDetailViewModel fetching gratitudeList by key: $gratitudeListKey")
-//        gratitudeList.addSource(database.getGratitudeList(gratitudeListKey),
-//                gratitudeList::setValue)
-        gratitudeList = database.getGratitudeList(gratitudeListKey)
-//        gratitudeItems.addSource(database.getAllItemsForGratitudeList(gratitudeListKey),
-//                gratitudeItems::setValue)
-        gratitudeItems = database.getAllItemsForGratitudeList(gratitudeListKey)
-        //Timber.d("GratitudeDetailViewModel obtained gratitudeList ${database.get(gratitudeListKey)?.value}")
     }
 
     /** Should be close the softkeyboard (e.g. after adding new item)?
@@ -76,13 +62,14 @@ class GratitudeDetailViewModel (
         _navigateToGratitude.value = null
     }
 
-    private suspend fun deleteItem(gratitudeItemId: Long) {
+    private suspend fun deleteItem(gratitudeItemId: String) {
         withContext(Dispatchers.IO) {
-            database.deleteItem(gratitudeItemId)
+            Timber.d("Pretend to delete item $gratitudeItemId")
+            gratitudeRepository.removeGratitudeItem(gratitudeListKey, gratitudeItemId)
         }
     }
 
-    fun deleteGratitudeItem(gratitudeItemId: Long) {
+    fun deleteGratitudeItem(gratitudeItemId: String) {
         Timber.d("Delete item with id $gratitudeItemId")
         viewModelScope.launch {
                 deleteItem(gratitudeItemId)
@@ -90,9 +77,9 @@ class GratitudeDetailViewModel (
 
     }
 
-    private suspend fun insert(gratitudeItem: GratitudeItem) {
+    private suspend fun insert(gratitudeItemText: String) {
         withContext(Dispatchers.IO) {
-            database.insertItem(gratitudeItem)
+            gratitudeRepository.addGratitudeListItem(gratitudeListKey, gratitudeItemText)
         }
     }
 
@@ -100,10 +87,7 @@ class GratitudeDetailViewModel (
         viewModelScope.launch {
             if(!newGratitudeItemText.value.isNullOrEmpty()) {
                 val newItemText = newGratitudeItemText.value.toString()
-                val newGratitudeItem = GratitudeItem(
-                    parentListId = gratitudeListKey,
-                    gratitudeText = newItemText)
-                insert(newGratitudeItem)
+                insert(newItemText)
             }
         }
 
@@ -115,7 +99,7 @@ class GratitudeDetailViewModel (
 
     private suspend fun deleteList() {
         withContext(Dispatchers.IO) {
-            database.deleteGratitudeList(gratitudeListKey)
+            gratitudeRepository.removeGratitudeList(gratitudeListKey)
         }
     }
 
@@ -129,7 +113,8 @@ class GratitudeDetailViewModel (
 
     private suspend fun clearList() {
         withContext(Dispatchers.IO) {
-            database.clearGratitudeListItems(gratitudeListKey)
+            Timber.d("Clear gratitude items for parent list $gratitudeListKey")
+            gratitudeRepository.clearGratitudeItems(gratitudeListKey)
         }
     }
 
@@ -139,13 +124,14 @@ class GratitudeDetailViewModel (
         }
     }
 
-    private suspend fun updateItem(gratitudeItem: GratitudeItem) {
+    private suspend fun updateItem(gratitudeItem: FirebaseGratitudeItem) {
         withContext(Dispatchers.IO) {
-            database.updateItem(gratitudeItem)
+            gratitudeRepository.updateGratitudeItem(gratitudeListKey, gratitudeItem.gratitudeItemId,
+                gratitudeItem.gratitudeText)
         }
     }
 
-    fun updateGratitudeItem(gratitudeItem: GratitudeItem) {
+    fun updateGratitudeItem(gratitudeItem: FirebaseGratitudeItem) {
         Timber.d("Update item with id ${gratitudeItem.gratitudeItemId}")
         viewModelScope.launch {
             updateItem(gratitudeItem)

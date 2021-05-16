@@ -24,7 +24,7 @@
         android:label="GratitudeDetailFragment">
         <argument
             android:name="gratitudeListIdKey"
-            app:argType="long" />
+            app:argType="string" />
         <action
             android:id="@+id/action_navigation_gratitudeDetailFragment_to_home"
             app:destination="@id/navigation_gratitude"
