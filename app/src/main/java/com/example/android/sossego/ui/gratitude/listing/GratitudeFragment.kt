@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
-import com.example.android.sossego.database.gratitude.GratitudeDatabase
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.quotes.database.QuoteDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
@@ -46,9 +45,7 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
         // Build view model with access to the database by using a factory
         val application = requireNotNull(this.activity).application
-        val dataSource = GratitudeDatabase.getInstance(application).gratitudeDatabaseDao
-        val viewModelFactory = GratitudeViewModelFactory(dataSource,
-            gratitudeRepository, application)
+        val viewModelFactory = GratitudeViewModelFactory(gratitudeRepository, application)
         val gratitudeViewModel = ViewModelProvider(
                 this, viewModelFactory).get(GratitudeViewModel::class.java)
 

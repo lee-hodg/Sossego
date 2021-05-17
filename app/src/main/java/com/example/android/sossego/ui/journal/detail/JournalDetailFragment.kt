@@ -10,12 +10,35 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.android.sossego.R
-import com.example.android.sossego.database.journal.JournalDatabase
+import com.example.android.sossego.database.journal.FirebaseJournalEntry
+import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.databinding.FragmentJournalDetailBinding
+import com.example.android.sossego.hideKeyboard
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
+import org.koin.android.ext.android.inject
+import org.koin.core.KoinComponent
+import timber.log.Timber
 
 
-class JournalEntryDetailFragment : Fragment() {
+class JournalEntryDetailFragment : Fragment(), KoinComponent {
 
+    private val journalRepository: JournalRepository by inject()
+
+    private var journalEntryKey: String? = null
+
+//    private var journalEntryDetailListener: ValueEventListener? = null
+//
+//
+//    override fun onStop() {
+//        super.onStop()
+//        if(journalEntryKey != null && journalEntryDetailListener != null) {
+//            journalRepository.removeJournalEntryDetailValueEventListener(journalEntryDetailListener,
+//                journalEntryKey)
+//        }
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,13 +52,13 @@ class JournalEntryDetailFragment : Fragment() {
         )
 
         // Now we build the view model and take the safeargs passed
-        val application = requireNotNull(this.activity).application
+//        val application = requireNotNull(this.activity).application
         val arguments = JournalEntryDetailFragmentArgs.fromBundle(requireArguments())
-
+        journalEntryKey = arguments.journalEntryIdKey
 
         // Create an instance of the ViewModel Factory.
-        val dataSource = JournalDatabase.getInstance(application).journalDatabaseDao
-        val viewModelFactory = JournalEntryViewModelFactory(arguments.journalEntryIdKey, dataSource)
+        val viewModelFactory = JournalEntryViewModelFactory(arguments.journalEntryIdKey,
+        journalRepository)
         // Get a reference to the ViewModel associated with this fragment.
         val journalEntryDetailViewModel =
             ViewModelProvider(
@@ -62,6 +85,30 @@ class JournalEntryDetailFragment : Fragment() {
             }
         })
 
+
+        // Hide the soft keyboard for example when journal text is saved
+        // this is a UI action so happens in the fragment, but the logic to determine
+        // if it should happen lives in the viewmodel
+        journalEntryDetailViewModel.hideSoftKeyboard.observe(viewLifecycleOwner, {
+            it?.let {
+                hideKeyboard()
+                journalEntryDetailViewModel.softKeyboardHidden()
+            }
+        })
+
+        val journalEntryDetailListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val journalEntry = dataSnapshot.getValue<FirebaseJournalEntry>()
+                journalEntryDetailViewModel.journalEntry.value = journalEntry
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+                Timber.d("onCancelled called")
+            }
+        }
+        Timber.d("Add entry detail listener with Id ${arguments.journalEntryIdKey}")
+        journalRepository.addJournalEntryDetailValueEventListener(journalEntryDetailListener,
+            arguments.journalEntryIdKey)
 
         return binding.root
     }

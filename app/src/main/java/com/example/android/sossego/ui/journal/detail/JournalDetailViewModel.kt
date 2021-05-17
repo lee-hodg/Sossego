@@ -1,21 +1,37 @@
 package com.example.android.sossego.ui.journal.detail
 
 import android.view.View
-import com.example.android.sossego.database.journal.JournalDatabaseDao
-import com.example.android.sossego.database.journal.JournalEntry
 import androidx.lifecycle.*
-import com.example.android.sossego.database.gratitude.GratitudeItem
+import com.example.android.sossego.database.journal.FirebaseJournalEntry
+import com.example.android.sossego.database.journal.repository.JournalRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class JournalEntryDetailViewModel (
-    journalEntryKey: Long = 0L,
-    val database: JournalDatabaseDao
+    private val journalEntryKey: String,
+    private val journalRepository: JournalRepository
 ) : ViewModel() {
 
-    val journalEntry:  LiveData<JournalEntry?> = database.getJournalEntry(journalEntryKey)
+    companion object {
+        const val TAG = "JournalDetViewModel"
+    }
+
+    var journalEntry:  MutableLiveData<FirebaseJournalEntry?> = MutableLiveData()
+
+
+    /** Should be close the soft keyboard (e.g. after adding new item)?
+     *
+     */
+    private val _hideSoftKeyboard = MutableLiveData<Boolean?>()
+
+    val hideSoftKeyboard: LiveData<Boolean?>
+        get() = _hideSoftKeyboard
+
+    fun softKeyboardHidden(){
+        _hideSoftKeyboard.value = null
+    }
 
     /**
      * Variable that tells the fragment whether it should navigate to listing.
@@ -32,8 +48,8 @@ class JournalEntryDetailViewModel (
 
     private suspend fun delete() {
         withContext(Dispatchers.IO) {
-            val journalEntryValue = journalEntry.value
-            journalEntryValue?.let{database.delete(journalEntryValue)}
+            Timber.tag(TAG).d("delete with key $journalEntryKey")
+            journalRepository.removeJournalEntry(journalEntryKey)
         }
     }
 
@@ -41,14 +57,21 @@ class JournalEntryDetailViewModel (
         viewModelScope.launch {
             delete()
         }
+
         // go back to listing
+        _hideSoftKeyboard.value = true
         _navigateToListing.value = true
     }
 
     private suspend fun update() {
         withContext(Dispatchers.IO) {
-            val journalEntryValue = journalEntry.value
-            journalEntryValue?.let{database.update(journalEntryValue)}
+            val journalEntryValue = journalEntry.value?.entryText
+            journalEntryValue.let{
+                if (journalEntryValue != null) {
+                    journalRepository.updateJournalEntry(journalEntryKey,
+                        journalEntryValue)
+                }
+            }
         }
     }
 
@@ -58,16 +81,20 @@ class JournalEntryDetailViewModel (
         }
         // go back to listing
         _navigateToListing.value = true
+        _hideSoftKeyboard.value = true
+
     }
 
     fun onFocusChangeListener() = View.OnFocusChangeListener { _, hasFocus ->
         if (!hasFocus) {
             // Do something when edit text lost focus
             // (this includes Enter, clicking away and navigating back)
-            val currentText = journalEntry.value?.entryText ?: ""
-            if (currentText.isNotBlank()) {
-                Timber.d("The text changed to $currentText")
-                saveJournalEntry()
+            val currentText = journalEntry.value?.entryText
+            if (currentText != null) {
+                if (currentText.isNotBlank()) {
+                    Timber.tag(TAG).d("The text changed to $currentText")
+                    saveJournalEntry()
+                }
             }
         }
     }

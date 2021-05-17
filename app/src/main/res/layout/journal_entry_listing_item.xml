@@ -8,7 +8,7 @@
 
         <variable
             name="journalEntry"
-            type="com.example.android.sossego.database.journal.JournalEntry" />
+            type="com.example.android.sossego.database.journal.FirebaseJournalEntry" />
 
         <variable
             name="clickListener"

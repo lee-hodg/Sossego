@@ -1,5 +1,6 @@
 package com.example.android.sossego.database.gratitude.repository
 
+import com.example.android.sossego.database.BaseRepository
 import com.google.firebase.database.ValueEventListener
 
 /**

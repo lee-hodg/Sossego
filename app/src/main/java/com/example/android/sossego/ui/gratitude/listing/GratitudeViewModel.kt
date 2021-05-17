@@ -2,19 +2,12 @@ package com.example.android.sossego.ui.gratitude.listing
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
-import com.example.android.sossego.database.gratitude.GratitudeDatabaseDao
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class GratitudeViewModel(
-    val database: GratitudeDatabaseDao,
     private val gratitudeRepository: GratitudeRepository,
     application: Application
 ) : AndroidViewModel(application) {

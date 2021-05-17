@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
-import com.example.android.sossego.database.gratitude.GratitudeDatabase
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.databinding.FragmentGratitudeDetailBinding
 import com.example.android.sossego.hideKeyboard
@@ -51,15 +50,14 @@ class GratitudeDetailFragment : Fragment(), KoinComponent {
             inflater, R.layout.fragment_gratitude_detail, container, false)
 
         // Now we build the view model and take the safeargs passed
-        val application = requireNotNull(this.activity).application
+//        val application = requireNotNull(this.activity).application
         val arguments = GratitudeDetailFragmentArgs.fromBundle(requireArguments())
 
         Timber.tag(TAG).d("We got arguments $arguments")
 
         // Create an instance of the ViewModel Factory.
-        val dataSource = GratitudeDatabase.getInstance(application).gratitudeDatabaseDao
         val viewModelFactory = GratitudeDetailViewModelFactory(arguments.gratitudeListIdKey,
-            dataSource, gratitudeRepository)
+            gratitudeRepository)
         // Get a reference to the ViewModel associated with this fragment.
         val gratitudeDetailViewModel =
             ViewModelProvider(

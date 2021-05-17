@@ -1,7 +1,5 @@
 package com.example.android.sossego.ui.journal.listing
 
-import com.example.android.sossego.database.journal.JournalEntry
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
 import com.example.android.sossego.convertTimestampToMonthYear
+import com.example.android.sossego.database.journal.FirebaseJournalEntry
 import com.example.android.sossego.databinding.JournalEntryListingItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,7 @@ class JournalEntryListAdapter(private val clickListener: JournalEntryListener) :
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
-    fun submitJournalEntryList(list: List<JournalEntry>?) {
+    fun submitJournalEntryList(list: List<FirebaseJournalEntry>?) {
         adapterScope.launch {
 
             val listItems : MutableList<DataItem> = ArrayList()
@@ -101,7 +100,7 @@ class JournalEntryListAdapter(private val clickListener: JournalEntryListener) :
     class ViewHolder private constructor(private val binding: JournalEntryListingItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(clickListener: JournalEntryListener, item: JournalEntry) {
+        fun bind(clickListener: JournalEntryListener, item: FirebaseJournalEntry) {
             binding.journalEntry = item
             binding.clickListener = clickListener
             binding.executePendingBindings()
@@ -135,20 +134,24 @@ class JournalEntryDiffCallback : DiffUtil.ItemCallback<DataItem>() {
     }
 }
 
-class JournalEntryListener(val clickListener: (journalEntryId: Long) -> Unit) {
-    fun onClick(journalEntry: JournalEntry) = clickListener(journalEntry.journalEntryId)
+class JournalEntryListener(val clickListener: (journalEntryId: String) -> Unit) {
+    fun onClick(journalEntry: FirebaseJournalEntry) = journalEntry.journalEntryId?.let {
+        clickListener(
+            it
+        )
+    }
 }
 
 
 sealed class DataItem {
-    abstract val id: Long
+    abstract val id: String?
 
-    data class JournalEntryItem(val journalEntry: JournalEntry): DataItem() {
+    data class JournalEntryItem(val journalEntry: FirebaseJournalEntry): DataItem() {
         override val id = journalEntry.journalEntryId
     }
 
     data class Header(val monthYear: String): DataItem() {
-        override val id = Long.MIN_VALUE
+        override val id: Nothing? = null
     }
 }
 

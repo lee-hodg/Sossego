@@ -9,6 +9,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.work.*
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
+import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.database.quotes.work.RefreshDataWorker
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
@@ -28,18 +29,25 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun initKoin() {
-        val myModule = module {
+        val gratitudeModule = module {
             single {
                 GratitudeRepository.getInstance()
             }
 
         }
-        // start Koin!
+
+        val journalModule = module {
+            single {
+                JournalRepository.getInstance()
+            }
+        }
+
+            // start Koin!
         startKoin {
             // declare used Android context
             androidContext(applicationContext)
             // declare modules
-            modules(myModule)
+            modules(listOf(gratitudeModule, journalModule))
         }
     }
 

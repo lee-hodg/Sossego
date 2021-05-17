@@ -7,6 +7,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
+import com.example.android.sossego.ui.gratitude.listing.GratitudeListAdapter
+import com.example.android.sossego.ui.journal.listing.JournalEntryListAdapter
 
 
 abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -38,6 +40,14 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
         target: RecyclerView.ViewHolder
     ): Boolean {
         return false
+    }
+
+    override fun getSwipeDirs (recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+        // prevent header swipes
+        if (viewHolder is JournalEntryListAdapter.HeaderViewHolder) return 0
+        if (viewHolder is GratitudeListAdapter.HeaderViewHolder) return 0
+
+        return super.getSwipeDirs(recyclerView, viewHolder)
     }
 
     override fun onChildDraw(

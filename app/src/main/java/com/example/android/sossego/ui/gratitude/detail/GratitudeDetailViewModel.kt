@@ -3,7 +3,6 @@ package com.example.android.sossego.ui.gratitude.detail
 import androidx.lifecycle.*
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeItem
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
-import com.example.android.sossego.database.gratitude.GratitudeDatabaseDao
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,7 +11,6 @@ import timber.log.Timber
 
 class GratitudeDetailViewModel (
     private val gratitudeListKey: String,
-    val database: GratitudeDatabaseDao,
     private val gratitudeRepository: GratitudeRepository
     ) : ViewModel() {
 

@@ -4,24 +4,23 @@ import androidx.lifecycle.MutableLiveData
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.example.android.sossego.database.journal.JournalDatabaseDao
-import com.example.android.sossego.database.journal.JournalEntry
+import com.example.android.sossego.database.journal.FirebaseJournalEntry
+import com.example.android.sossego.database.journal.repository.JournalRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class JournalListingViewModel(
-    val database: JournalDatabaseDao,
-    application: Application
+    application: Application,
+    private val journalRepository: JournalRepository
 ) : AndroidViewModel(application) {
-
-    val journalEntries = database.getAllJournalEntries()
 
     /**
      * Variable that tells the Fragment to navigate back to the listing
      * This is private because we don't want to expose setting this value to the Fragment.
      */
-    private val _navigateListToDetail = MutableLiveData<Long?>()
+    private val _navigateListToDetail = MutableLiveData<String?>()
     val navigateListToDetail
         get() = _navigateListToDetail
 
@@ -29,42 +28,38 @@ class JournalListingViewModel(
         _navigateListToDetail.value = null
     }
 
-    fun onListItemClicked(listItemId: Long) {
+    fun onListItemClicked(listItemId: String) {
         _navigateListToDetail.value = listItemId
     }
 
-    /**
-     * Logic to deal with adding a new journal entry
-     */
-    private suspend fun insert(journalEntry: JournalEntry) {
+    private suspend fun insert(): String {
+        val journalEntryKey: String
         withContext(Dispatchers.IO) {
-            database.insert(journalEntry)
+            journalEntryKey = journalRepository.createJournalEntry()
         }
+        return journalEntryKey
     }
 
     fun addNewJournalEntry() {
         viewModelScope.launch {
-
-            val newJournalEntry = JournalEntry()
-
-            insert(newJournalEntry)
-
-            _navigateListToDetail.value = newJournalEntry.journalEntryId
+            val journalEntryKey = insert()
+            _navigateListToDetail.value = journalEntryKey
         }
     }
 
     /**
      * Logic to deal with deleting a journal entry
      */
-    private suspend fun delete(journalEntry: JournalEntry) {
+    private suspend fun delete(journalEntryKey: String) {
         withContext(Dispatchers.IO) {
-            database.delete(journalEntry)
+            Timber.d("journalEntryListing removeJournalEntry with key $journalEntryKey")
+            journalRepository.removeJournalEntry(journalEntryKey)
         }
     }
 
-    fun deleteJournalEntry(journalEntry: JournalEntry) {
+    fun deleteJournalEntry(journalEntry: FirebaseJournalEntry) {
         viewModelScope.launch {
-            delete(journalEntry)
+            journalEntry.journalEntryId?.let { delete(it) }
         }
     }
 }
