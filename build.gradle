@@ -17,6 +17,7 @@ buildscript {
         version_firebase = "28.0.0"
         version_koin = "2.0.1"
         version_firebase_ui = "7.1.1"
+        version_firebase_auth_ui = "5.0.0"
     }
 
 

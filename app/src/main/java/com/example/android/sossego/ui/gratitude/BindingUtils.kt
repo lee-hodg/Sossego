@@ -1,5 +1,6 @@
 package com.example.android.sossego.ui.gratitude
 
+import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.example.android.sossego.convertLongToDateString
@@ -38,6 +39,17 @@ fun TextView.setQuote(item: Quote?) {
     item?.let {
         text = "\"" + item.quoteText + "\"" + " - " + item.author
     }
+}
+
+@BindingAdapter("visibleOrGone")
+fun View.visibleOrGone(visible: Boolean) {
+    visibility = if(visible) View.VISIBLE else View.GONE
+}
+
+
+@BindingAdapter("visibleOrInvisible")
+fun View.visibleOrInvisible(visible: Boolean) {
+    visibility = if(visible) View.VISIBLE else View.INVISIBLE
 }
 
 

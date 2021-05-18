@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -15,6 +16,8 @@ import com.example.android.sossego.database.journal.FirebaseJournalEntry
 import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.databinding.FragmentJournalListingBinding
 import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
+import com.example.android.sossego.ui.gratitude.listing.GratitudeFragment
+import com.example.android.sossego.ui.login.LoginViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -28,8 +31,16 @@ import timber.log.Timber
  */
 class JournalListingFragment : Fragment() {
 
+    companion object {
+        const val TAG = "JournalFragment"
+    }
+
+
     // Dependency inject the repository
     private val journalRepository: JournalRepository by inject()
+
+    // Get a reference to the ViewModel scoped to this Fragment.
+    private val loginViewModel by viewModels<LoginViewModel>()
 
 
     override fun onCreateView(
@@ -58,6 +69,21 @@ class JournalListingFragment : Fragment() {
 
         // Set this to be the lifecycle owner
         binding.lifecycleOwner = this
+
+        // Observe the authentication state so we can know if the user has logged in successfully.
+        // If the user has logged in successfully
+        loginViewModel.authenticationState.observe(viewLifecycleOwner, { authenticationState ->
+            when (authenticationState) {
+                LoginViewModel.AuthenticationState.AUTHENTICATED -> {
+                    Timber.tag(TAG).d("Logged in success")
+                    journalListingViewModel.userLoggedIn()
+                }
+                else -> {
+                    Timber.tag(TAG).d("Un-authenticated: $authenticationState")
+                    journalListingViewModel.userLoggedOut()
+                }
+            }
+        })
 
         // Add an Observer on this variable to tell us when to navigate to the detail view
         // navigation is UI so is done in the fragment, but click-handler changes data on the

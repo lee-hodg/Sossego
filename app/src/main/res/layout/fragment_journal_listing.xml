@@ -27,6 +27,7 @@
             android:layout_marginTop="@dimen/margin"
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginBottom="@dimen/margin"
+            app:visibleOrInvisible="@{journalListingViewModel.isUserAuthenticated}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -42,9 +43,23 @@
             android:clickable="false"
             android:contentDescription="@string/add_journal_entry_fab_content_description"
             android:onClick="@{() -> journalListingViewModel.addNewJournalEntry()}"
+            app:visibleOrInvisible="@{journalListingViewModel.isUserAuthenticated}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_menu_add" />
+
+        <TextView
+            android:id="@+id/login_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/please_login"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleOrGone="@{!journalListingViewModel.isUserAuthenticated}" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

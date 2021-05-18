@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.android.sossego.R
@@ -14,6 +15,10 @@ import com.example.android.sossego.database.journal.FirebaseJournalEntry
 import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.databinding.FragmentJournalDetailBinding
 import com.example.android.sossego.hideKeyboard
+import com.example.android.sossego.ui.gratitude.detail.GratitudeDetailFragment
+import com.example.android.sossego.ui.gratitude.detail.GratitudeDetailFragmentDirections
+import com.example.android.sossego.ui.gratitude.listing.GratitudeFragment
+import com.example.android.sossego.ui.login.LoginViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -29,6 +34,10 @@ class JournalEntryDetailFragment : Fragment(), KoinComponent {
 
     private var journalEntryKey: String? = null
 
+    companion object{
+        const val TAG = "JournalDetailFrag"
+    }
+
 //    private var journalEntryDetailListener: ValueEventListener? = null
 //
 //
@@ -39,6 +48,10 @@ class JournalEntryDetailFragment : Fragment(), KoinComponent {
 //                journalEntryKey)
 //        }
 //    }
+
+    // Get a reference to the ViewModel scoped to this Fragment.
+    private val loginViewModel by viewModels<LoginViewModel>()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,6 +98,25 @@ class JournalEntryDetailFragment : Fragment(), KoinComponent {
             }
         })
 
+        // Observe the authentication state so we can know if the user has logged in successfully.
+        // If the user has logged in successfully
+        loginViewModel.authenticationState.observe(viewLifecycleOwner, { authenticationState ->
+            when (authenticationState) {
+                LoginViewModel.AuthenticationState.AUTHENTICATED -> {
+                    Timber.tag(TAG).d("Logged in success")
+                }
+                else -> {
+                    Timber.tag(GratitudeFragment.TAG).d("Un-authenticated: $authenticationState")
+                    // If logged out navigate back to listing
+                    this.findNavController().navigate(
+                        JournalEntryDetailFragmentDirections.actionJournalEntryDetailFragment2ToNavigationJournal()
+                    )
+                    // Reset state to make sure we only navigate once, even if the device
+                    // has a configuration change.
+                    journalEntryDetailViewModel.doneNavigating()
+                }
+            }
+        })
 
         // Hide the soft keyboard for example when journal text is saved
         // this is a UI action so happens in the fragment, but the logic to determine

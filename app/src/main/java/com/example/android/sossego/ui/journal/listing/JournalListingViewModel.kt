@@ -16,6 +16,19 @@ class JournalListingViewModel(
     private val journalRepository: JournalRepository
 ) : AndroidViewModel(application) {
 
+    // Monitor if user has authenticated or not
+    private val _isUserAuthenticated = MutableLiveData<Boolean>()
+    val isUserAuthenticated
+        get() = _isUserAuthenticated
+
+    fun userLoggedIn() {
+        _isUserAuthenticated.value = true
+    }
+
+    fun userLoggedOut() {
+        _isUserAuthenticated.value = false
+    }
+
     /**
      * Variable that tells the Fragment to navigate back to the listing
      * This is private because we don't want to expose setting this value to the Fragment.

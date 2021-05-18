@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,6 +18,8 @@ import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.databinding.FragmentGratitudeDetailBinding
 import com.example.android.sossego.hideKeyboard
+import com.example.android.sossego.ui.gratitude.listing.GratitudeFragment
+import com.example.android.sossego.ui.login.LoginViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -39,6 +42,10 @@ class GratitudeDetailFragment : Fragment(), KoinComponent {
     companion object{
         private const val TAG = "GratitudeDetailFragment"
     }
+
+    // Get a reference to the ViewModel scoped to this Fragment.
+    private val loginViewModel by viewModels<LoginViewModel>()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -91,6 +98,26 @@ class GratitudeDetailFragment : Fragment(), KoinComponent {
                 {gratitudeItem ->
                     gratitudeDetailViewModel.deleteGratitudeItem(gratitudeItem.gratitudeItemId)})
         )
+
+        // Observe the authentication state so we can know if the user has logged in successfully.
+        // If the user has logged in successfully
+        loginViewModel.authenticationState.observe(viewLifecycleOwner, { authenticationState ->
+            when (authenticationState) {
+                LoginViewModel.AuthenticationState.AUTHENTICATED -> {
+                    Timber.tag(TAG).d("Logged in success")
+                }
+                else -> {
+                    Timber.tag(GratitudeFragment.TAG).d("Un-authenticated: $authenticationState")
+                    // If logged out navigate back to listing
+                    this.findNavController().navigate(
+                        GratitudeDetailFragmentDirections.actionNavigationGratitudeDetailFragmentToHome()
+                    )
+                    // Reset state to make sure we only navigate once, even if the device
+                    // has a configuration change.
+                    gratitudeDetailViewModel.doneNavigating()
+                }
+            }
+        })
 
 
         /* Listen for changes in this particular gratitudeList that we are viewing the

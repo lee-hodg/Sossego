@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -17,6 +18,7 @@ import com.example.android.sossego.database.gratitude.repository.GratitudeReposi
 import com.example.android.sossego.database.quotes.database.QuoteDatabase
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
 import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
+import com.example.android.sossego.ui.login.LoginViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -30,6 +32,13 @@ import timber.log.Timber
  * in a recyclerview.
  */
 class GratitudeFragment : Fragment(), KoinComponent {
+
+    companion object {
+        const val TAG = "GratitudeFragment"
+    }
+
+    // Get a reference to the ViewModel scoped to this Fragment.
+    private val loginViewModel by viewModels<LoginViewModel>()
 
     private val gratitudeRepository: GratitudeRepository by inject()
 
@@ -49,6 +58,21 @@ class GratitudeFragment : Fragment(), KoinComponent {
         val gratitudeViewModel = ViewModelProvider(
                 this, viewModelFactory).get(GratitudeViewModel::class.java)
 
+
+        // Observe the authentication state so we can know if the user has logged in successfully.
+        // If the user has logged in successfully
+        loginViewModel.authenticationState.observe(viewLifecycleOwner, { authenticationState ->
+            when (authenticationState) {
+                LoginViewModel.AuthenticationState.AUTHENTICATED -> {
+                    Timber.tag(TAG).d("Logged in success")
+                    gratitudeViewModel.userLoggedIn()
+                }
+                else -> {
+                    Timber.tag(TAG).d("Un-authenticated: $authenticationState")
+                    gratitudeViewModel.userLoggedOut()
+                }
+            }
+        })
 
         // Make it accessible to the binding (remember the xml must have outer layout tag
         // for data-binding to work)

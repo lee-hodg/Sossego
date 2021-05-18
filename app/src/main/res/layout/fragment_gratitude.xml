@@ -47,6 +47,7 @@
             android:layout_marginEnd="@dimen/margin"
             android:layout_marginBottom="@dimen/margin"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:visibleOrInvisible="@{gratitudeViewModel.isUserAuthenticated}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,9 +63,21 @@
             android:contentDescription="@string/add_gratitude_list_fab_content"
             android:onClick="@{() -> gratitudeViewModel.addNewGratitudeList()}"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:visibleOrInvisible="@{gratitudeViewModel.isUserAuthenticated}"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_menu_add" />
 
+        <TextView
+            android:id="@+id/login_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/please_login"
+            android:textStyle="bold"
+            app:visibleOrGone="@{!gratitudeViewModel.isUserAuthenticated}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/quote_of_the_day_text" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
