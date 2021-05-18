@@ -16,6 +16,7 @@ import androidx.work.*
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.database.quotes.work.RefreshDataWorker
+import com.example.android.sossego.database.user.repository.UserRepository
 import com.example.android.sossego.ui.gratitude.listing.GratitudeFragment
 import com.example.android.sossego.ui.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
@@ -46,6 +47,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     // Get a reference to the ViewModel scoped to this Fragment.
     private val loginViewModel: LoginViewModel by inject()
 
+    private val userRepository: UserRepository by inject()
+
     private val applicationScope = CoroutineScope(Dispatchers.Default)
 
 
@@ -63,6 +66,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
         }
 
+        val userModule = module {
+            single {
+                UserRepository.getInstance()
+            }
+        }
+
         val loginModule = module {
             single {
                 LoginViewModel()
@@ -74,7 +83,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             // declare used Android context
             androidContext(applicationContext)
             // declare modules
-            modules(listOf(gratitudeModule, journalModule, loginModule))
+            modules(listOf(gratitudeModule, journalModule, userModule, loginModule))
         }
     }
 
@@ -193,6 +202,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             if (resultCode == Activity.RESULT_OK) {
                 // User successfully signed in
                 Timber.tag(TAG).i("Successfully signed in user ${FirebaseAuth.getInstance().currentUser?.displayName}!")
+                if (response != null) {
+                    if(response.isNewUser){
+                        Timber.tag(TAG).i("Create new user in the db")
+                        userRepository.createNewUser(FirebaseAuth.getInstance().currentUser!!.uid,
+                            FirebaseAuth.getInstance().currentUser?.displayName,
+                            FirebaseAuth.getInstance().currentUser?.email)
+                    }
+                }
             } else {
                 // Sign in failed. If response is null the user canceled the
                 // sign-in flow using the back button. Otherwise check

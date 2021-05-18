@@ -3,6 +3,7 @@ package com.example.android.sossego.database
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeItem
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.journal.FirebaseJournalEntry
+import com.example.android.sossego.database.user.repository.User
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
@@ -15,6 +16,7 @@ class AppDatabase private constructor() {
     private lateinit var dbRootRef: DatabaseReference
     private lateinit var gratitudeListNode: DatabaseReference
     private lateinit var journalEntryNode: DatabaseReference
+    private lateinit var userNode: DatabaseReference
 
     fun createGratitudeList(): String {
 
@@ -109,6 +111,14 @@ class AppDatabase private constructor() {
     }
 
     /**
+     * Handle user creation in the db
+     */
+    fun createNewUser(userId: String, displayName: String?, email: String?) {
+        val firebaseUser = User(uid=userId, displayName=displayName, email=email)
+        userNode.child(userId).setValue(firebaseUser)
+    }
+
+    /**
      * Singleton
      */
     companion object {
@@ -125,6 +135,7 @@ class AppDatabase private constructor() {
                     appDatabase!!.dbRootRef = appDatabase!!.database.reference
                     appDatabase!!.gratitudeListNode = appDatabase!!.dbRootRef.child("gratitude_lists")
                     appDatabase!!.journalEntryNode = appDatabase!!.dbRootRef.child("journal_entries")
+                    appDatabase!!.userNode = appDatabase!!.dbRootRef.child("users")
                 }
                 return appDatabase!!
             }
