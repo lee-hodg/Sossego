@@ -38,7 +38,7 @@ class GratitudeFragment : Fragment(), KoinComponent {
     }
 
     // Get a reference to the ViewModel scoped to this Fragment.
-    private val loginViewModel by viewModels<LoginViewModel>()
+    private val loginViewModel: LoginViewModel by inject()
 
     private val gratitudeRepository: GratitudeRepository by inject()
 

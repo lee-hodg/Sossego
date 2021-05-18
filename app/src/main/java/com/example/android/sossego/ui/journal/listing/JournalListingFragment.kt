@@ -40,7 +40,7 @@ class JournalListingFragment : Fragment() {
     private val journalRepository: JournalRepository by inject()
 
     // Get a reference to the ViewModel scoped to this Fragment.
-    private val loginViewModel by viewModels<LoginViewModel>()
+    private val loginViewModel: LoginViewModel by inject()
 
 
     override fun onCreateView(

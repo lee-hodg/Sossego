@@ -25,7 +25,9 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import timber.log.Timber
@@ -33,7 +35,7 @@ import timber.log.Timber.DebugTree
 import java.util.concurrent.TimeUnit
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), KoinComponent {
 
     companion object {
         const val SIGN_IN_REQUEST_CODE = 1001
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Get a reference to the ViewModel scoped to this Fragment.
-    private val loginViewModel by viewModels<LoginViewModel>()
+    private val loginViewModel: LoginViewModel by inject()
 
     private val applicationScope = CoroutineScope(Dispatchers.Default)
 
@@ -61,12 +63,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val loginModule = module {
+            single {
+                LoginViewModel()
+            }
+        }
+
             // start Koin!
         startKoin {
             // declare used Android context
             androidContext(applicationContext)
             // declare modules
-            modules(listOf(gratitudeModule, journalModule))
+            modules(listOf(gratitudeModule, journalModule, loginModule))
         }
     }
 
@@ -152,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             else -> menuInflater.inflate(R.menu.auth_action_menu, menu)
         }
 
-        return super.onCreateOptionsMenu(menu);
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
