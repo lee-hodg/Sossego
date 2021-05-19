@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -16,7 +15,6 @@ import com.example.android.sossego.database.journal.FirebaseJournalEntry
 import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.databinding.FragmentJournalListingBinding
 import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
-import com.example.android.sossego.ui.gratitude.listing.GratitudeFragment
 import com.example.android.sossego.ui.login.LoginViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -42,6 +40,20 @@ class JournalListingFragment : Fragment() {
     // Get a reference to the ViewModel scoped to this Fragment.
     private val loginViewModel: LoginViewModel by inject()
 
+    private lateinit var journalListingViewModel: JournalListingViewModel
+
+    private lateinit var journalEntriesListener: ValueEventListener
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unhook the listener
+        journalListingViewModel.authenticatedUserId.value?.let {
+            journalRepository.removeJournalEntryListValueEventListener(
+                it,
+                journalEntriesListener)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,7 +70,7 @@ class JournalListingFragment : Fragment() {
         val application = requireNotNull(this.activity).application
         val viewModelFactory = JournalListingViewModelFactory(application,
             journalRepository)
-        val journalListingViewModel = ViewModelProvider(
+        journalListingViewModel = ViewModelProvider(
             this, viewModelFactory
         ).get(JournalListingViewModel::class.java)
 
@@ -121,7 +133,7 @@ class JournalListingFragment : Fragment() {
             })
 
 
-        val journalEntriesListener = object : ValueEventListener {
+        journalEntriesListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                 val journalEntries : MutableList<FirebaseJournalEntry> = mutableListOf()
@@ -144,11 +156,24 @@ class JournalListingFragment : Fragment() {
         // Observe the authentication state so we can know if the user has logged in successfully.
         // If the user has logged in successfully
         loginViewModel.authenticationUserId.observe(viewLifecycleOwner, { authUserId ->
-            journalListingViewModel.setAuthenticatedUserId(authUserId)
+
             when(authUserId){
-                null -> Timber.tag(TAG).d("Pretend to remove journal event listener")
-                else ->  journalRepository.addJournalEntryListValueEventListener(authUserId, journalEntriesListener)
+                null -> {
+                    // Unhook the listener for now unauthenticated user without userId
+                    journalListingViewModel.authenticatedUserId.value?.let {
+                        journalRepository.removeJournalEntryListValueEventListener(
+                            it,
+                            journalEntriesListener)
+                    }
+                }
+                else -> {
+                    // Hookup the listener for this auth user's entries
+                    journalRepository.addJournalEntryListValueEventListener(authUserId, journalEntriesListener)
+                }
             }
+            // Update the journalListingViewModel record of user id
+            journalListingViewModel.setAuthenticatedUserId(authUserId)
+
         })
 
         // Set our recyclerview to use this adapter

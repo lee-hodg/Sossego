@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -42,6 +41,22 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
     private val gratitudeRepository: GratitudeRepository by inject()
 
+    private lateinit var gratitudeViewModel: GratitudeViewModel
+
+    private lateinit var gratitudeListListener: ValueEventListener
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unhook the listener
+        gratitudeViewModel.authenticatedUserId.value?.let {
+            gratitudeRepository.removeGratitudeListValueEventListener(
+                it,
+                gratitudeListListener)
+        }
+    }
+
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -55,12 +70,12 @@ class GratitudeFragment : Fragment(), KoinComponent {
         // Build view model with access to the database by using a factory
         val application = requireNotNull(this.activity).application
         val viewModelFactory = GratitudeViewModelFactory(gratitudeRepository, application)
-        val gratitudeViewModel = ViewModelProvider(
+        gratitudeViewModel = ViewModelProvider(
                 this, viewModelFactory).get(GratitudeViewModel::class.java)
 
 
         // Observe the authentication state so we can know if the user has logged in successfully.
-        // If the user has logged in successfully
+        // We record this state on the gratitudeViewModel
         loginViewModel.authenticationState.observe(viewLifecycleOwner, { authenticationState ->
             when (authenticationState) {
                 LoginViewModel.AuthenticationState.AUTHENTICATED -> {
@@ -109,20 +124,8 @@ class GratitudeFragment : Fragment(), KoinComponent {
             gratitudeViewModel.onGratitudeListClicked(gratitudeListId)
         })
 
-        // We observe the gratitudeLists liveData of the view model. If it changes we must
-        // rebuild the recycler view with submitList
-//        gratitudeViewModel.gratitudeLists.observe(viewLifecycleOwner, {
-//            it?.let {
-//                gratitudeListAdapter.submitGratitudeList(it)
-//            }
-//        })
-
-        /**
-         * Can I somehow pass in the lambda? Confused
-         * Should I switch out to FIrebaseRecyclerView
-         * Sigh
-         */
-        val gratitudeListListener = object : ValueEventListener {
+        // Set the event listener callbacks
+        gratitudeListListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                 // Figure out how this can be some function we pass in?
@@ -136,7 +139,6 @@ class GratitudeFragment : Fragment(), KoinComponent {
                     listOfGratitudeLists.add(item!!)
                 }
 
-
                 gratitudeListAdapter.submitGratitudeList(listOfGratitudeLists)
 
             }
@@ -145,16 +147,30 @@ class GratitudeFragment : Fragment(), KoinComponent {
                 Timber.d("onCancelled called")
             }
         }
-        // Observe the authentication state so we can know if the user has logged in successfully.
-        // If the user has logged in successfully
-        loginViewModel.authenticationUserId.observe(viewLifecycleOwner, { authUserId ->
-            gratitudeViewModel.setAuthenticatedUserId(authUserId)
-            when(authUserId){
-                null -> Timber.tag(TAG).d("Pretend to remove event listener")
-                else -> gratitudeRepository.addGratitudeListValueEventListener(authUserId, gratitudeListListener)
-            }
-        })
 
+        // Observe the authentication state so we can know if the user has logged in successfully.
+        // After log-in/log-out we add/remove the event listener with the userId
+        // and we also record the userId on the gratitudeViewModel (or set it to null)
+        loginViewModel.authenticationUserId.observe(viewLifecycleOwner, { authUserId ->
+            when(authUserId){
+                null -> {
+                    // Unhook the listener now we have unauthenticated user
+                    gratitudeViewModel.authenticatedUserId.value?.let {
+                        gratitudeRepository.removeGratitudeListValueEventListener(
+                            it,
+                            gratitudeListListener)
+                    }
+                }
+                else -> {
+                    // Hook up the listener for this auth user id
+                    gratitudeRepository.addGratitudeListValueEventListener(authUserId,
+                        gratitudeListListener)
+                }
+            }
+            // Either way make sure our view model records the latest user id (or null)
+            gratitudeViewModel.setAuthenticatedUserId(authUserId)
+
+        })
 
 
         // Set our recyclerview to use this adapter

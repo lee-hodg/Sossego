@@ -37,6 +37,12 @@ class AppDatabase private constructor() {
         userFilteredGratitudeLists.addValueEventListener(valueEventListener)
     }
 
+    fun removeGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener) {
+        Timber.tag(TAG).d("Add gratitude list value event listener for userId $userId")
+        val userFilteredGratitudeLists = gratitudeListNode.orderByChild("userId").equalTo(userId)
+        userFilteredGratitudeLists.removeEventListener(valueEventListener)
+    }
+
     fun addGratitudeListDetailValueEventListener(valueEventListener: ValueEventListener,
                                                  childKey: String) {
         gratitudeListNode.child(childKey).addValueEventListener(valueEventListener)
@@ -76,6 +82,13 @@ class AppDatabase private constructor() {
         val userFilteredJournals = journalEntryNode.orderByChild("userId").equalTo(userId)
         userFilteredJournals.addValueEventListener(valueEventListener)
     }
+
+    fun removeJournalEntryListValueEventListener(userId: String, valueEventListener: ValueEventListener) {
+        Timber.tag(TAG).d("Remove journal entry list value event listener for userId $userId")
+        val userFilteredJournals = journalEntryNode.orderByChild("userId").equalTo(userId)
+        userFilteredJournals.removeEventListener(valueEventListener)
+    }
+
 
     fun createJournalEntry(userId: String): String {
         val journalEntryKey = journalEntryNode.push().key

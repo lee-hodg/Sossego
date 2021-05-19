@@ -12,6 +12,10 @@ class GratitudeRepository private constructor() : BaseRepository() {
         return mAppDatabase.addGratitudeListValueEventListener(userId, valueEventListener)
     }
 
+    fun removeGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener){
+        return mAppDatabase.removeGratitudeListValueEventListener(userId, valueEventListener)
+    }
+
     fun addGratitudeListDetailValueEventListener(valueEventListener: ValueEventListener,
                                                  childKey: String){
         return mAppDatabase.addGratitudeListDetailValueEventListener(valueEventListener, childKey)

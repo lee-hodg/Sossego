@@ -13,6 +13,10 @@ class JournalRepository private constructor() : BaseRepository() {
         return mAppDatabase.addJournalEntryListValueEventListener(userId, valueEventListener)
     }
 
+    fun removeJournalEntryListValueEventListener(userId: String, valueEventListener: ValueEventListener){
+        return mAppDatabase.removeJournalEntryListValueEventListener(userId, valueEventListener)
+    }
+
     fun addJournalEntryDetailValueEventListener(valueEventListener: ValueEventListener,
                                                 journalEntryKey: String){
         return mAppDatabase.addJournalEntryDetailValueEventListener(valueEventListener,
