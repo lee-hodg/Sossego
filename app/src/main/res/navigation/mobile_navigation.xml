@@ -70,6 +70,14 @@
         android:name="com.example.android.sossego.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.android.sossego.ui.settings.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_navigation_gratitude"
+            app:destination="@id/navigation_gratitude" />
+    </fragment>
 
 
 </navigation>

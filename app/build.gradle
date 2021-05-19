@@ -116,4 +116,8 @@ dependencies {
     // Koin for Kotlin apps (dependency injection, cf dagger java)
     implementation "org.koin:koin-android:$version_koin"
     implementation "org.koin:koin-android-viewmodel:$version_koin"
+
+
+    implementation("androidx.preference:preference-ktx:$preference_version")
+
 }

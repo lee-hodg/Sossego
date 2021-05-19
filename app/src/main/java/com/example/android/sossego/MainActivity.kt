@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -186,6 +185,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             R.id.settings_menu_item -> {
                 Timber.tag(TAG).d("Settings menu item selected")
+                launchSettings()
                 return true
             }
 
@@ -194,6 +194,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         return super.onOptionsItemSelected(item)
     }
+
+    private fun launchSettings(){
+        val navController = findNavController(R.id.nav_host_fragment)
+        navController.navigate(R.id.settingsFragment)
+
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
