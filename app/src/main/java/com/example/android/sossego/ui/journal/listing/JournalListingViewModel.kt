@@ -29,6 +29,14 @@ class JournalListingViewModel(
         _isUserAuthenticated.value = false
     }
 
+
+    private val _authenticatedUserId = MutableLiveData<String?>()
+    val authenticatedUserId
+        get() = _authenticatedUserId
+
+    fun setAuthenticatedUserId(userId: String?){
+        _authenticatedUserId.value = userId
+    }
     /**
      * Variable that tells the Fragment to navigate back to the listing
      * This is private because we don't want to expose setting this value to the Fragment.
@@ -48,7 +56,7 @@ class JournalListingViewModel(
     private suspend fun insert(): String {
         val journalEntryKey: String
         withContext(Dispatchers.IO) {
-            journalEntryKey = journalRepository.createJournalEntry()
+            journalEntryKey = journalRepository.createJournalEntry(_authenticatedUserId.value!!)
         }
         return journalEntryKey
     }

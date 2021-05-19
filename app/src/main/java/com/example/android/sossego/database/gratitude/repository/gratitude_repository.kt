@@ -8,8 +8,8 @@ import com.google.firebase.database.ValueEventListener
  */
 class GratitudeRepository private constructor() : BaseRepository() {
 
-    fun addGratitudeListValueEventListener(valueEventListener: ValueEventListener){
-        return mAppDatabase.addGratitudeListValueEventListener(valueEventListener)
+    fun addGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener){
+        return mAppDatabase.addGratitudeListValueEventListener(userId, valueEventListener)
     }
 
     fun addGratitudeListDetailValueEventListener(valueEventListener: ValueEventListener,
@@ -17,9 +17,8 @@ class GratitudeRepository private constructor() : BaseRepository() {
         return mAppDatabase.addGratitudeListDetailValueEventListener(valueEventListener, childKey)
     }
 
-
-    fun createGratitudeList(): String {
-        return mAppDatabase.createGratitudeList()
+    fun createGratitudeList(userId: String): String {
+        return mAppDatabase.createGratitudeList(userId=userId)
     }
 
     fun removeGratitudeList(parentListKey: String) {

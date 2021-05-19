@@ -41,6 +41,8 @@ class GratitudeViewModel(
 
     // Monitor if user has authenticated or not
     private val _isUserAuthenticated = MutableLiveData<Boolean>()
+    val isUserAuthenticated
+        get() = _isUserAuthenticated
 
     fun userLoggedIn() {
         _isUserAuthenticated.value = true
@@ -50,17 +52,23 @@ class GratitudeViewModel(
         _isUserAuthenticated.value = false
     }
 
-    val isUserAuthenticated
-        get() = _isUserAuthenticated
+    private val _authenticatedUserId = MutableLiveData<String?>()
+    val authenticatedUserId
+        get() = _authenticatedUserId
+
+    fun setAuthenticatedUserId(userId: String?){
+        _authenticatedUserId.value = userId
+    }
 
     init {
         _isUserAuthenticated.value = false
+        _authenticatedUserId.value = null
     }
 
     private suspend fun insert(): String? {
         val gratitudeListId: String?
         withContext(Dispatchers.IO) {
-            gratitudeListId = gratitudeRepository.createGratitudeList()
+            gratitudeListId = gratitudeRepository.createGratitudeList(_authenticatedUserId.value!!)
         }
         return gratitudeListId
     }

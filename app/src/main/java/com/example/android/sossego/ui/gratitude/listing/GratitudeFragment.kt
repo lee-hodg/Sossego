@@ -128,7 +128,10 @@ class GratitudeFragment : Fragment(), KoinComponent {
                 // Figure out how this can be some function we pass in?
                 val listOfGratitudeLists : MutableList<FirebaseGratitudeList> = mutableListOf()
 
-                for(gratitudeList in dataSnapshot.children.reversed()) {
+                // Ensure the lists are reverse createdDate ordered
+                val sortedGratitudeLists = dataSnapshot.children.sortedByDescending { "createdDate" }
+
+                for(gratitudeList in sortedGratitudeLists) {
                     val item = gratitudeList.getValue<FirebaseGratitudeList>()
                     listOfGratitudeLists.add(item!!)
                 }
@@ -142,8 +145,16 @@ class GratitudeFragment : Fragment(), KoinComponent {
                 Timber.d("onCancelled called")
             }
         }
+        // Observe the authentication state so we can know if the user has logged in successfully.
+        // If the user has logged in successfully
+        loginViewModel.authenticationUserId.observe(viewLifecycleOwner, { authUserId ->
+            gratitudeViewModel.setAuthenticatedUserId(authUserId)
+            when(authUserId){
+                null -> Timber.tag(TAG).d("Pretend to remove event listener")
+                else -> gratitudeRepository.addGratitudeListValueEventListener(authUserId, gratitudeListListener)
+            }
+        })
 
-        gratitudeRepository.addGratitudeListValueEventListener(gratitudeListListener)
 
 
         // Set our recyclerview to use this adapter

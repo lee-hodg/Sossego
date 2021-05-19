@@ -21,4 +21,8 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    val authenticationUserId = FirebaseUserLiveData().map { user ->
+        user?.uid
+    }
+
 }

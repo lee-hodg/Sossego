@@ -18,10 +18,11 @@ class AppDatabase private constructor() {
     private lateinit var journalEntryNode: DatabaseReference
     private lateinit var userNode: DatabaseReference
 
-    fun createGratitudeList(): String {
+    fun createGratitudeList(userId: String): String {
 
         val gratitudeListKey = gratitudeListNode.push().key
         val gratitudeList = FirebaseGratitudeList(gratitudeListId = gratitudeListKey!!,
+            userId=userId,
             createdDate=System.currentTimeMillis(),
             gratitudeItems = null)
 
@@ -30,9 +31,10 @@ class AppDatabase private constructor() {
         return gratitudeListKey
     }
 
-    fun addGratitudeListValueEventListener(valueEventListener: ValueEventListener) {
-        val dateOrderedLists = gratitudeListNode.orderByChild("createdDate")
-        dateOrderedLists.addValueEventListener(valueEventListener)
+    fun addGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener) {
+        Timber.tag(TAG).d("Add gratitude list value event listener for userId $userId")
+        val userFilteredGratitudeLists = gratitudeListNode.orderByChild("userId").equalTo(userId)
+        userFilteredGratitudeLists.addValueEventListener(valueEventListener)
     }
 
     fun addGratitudeListDetailValueEventListener(valueEventListener: ValueEventListener,
@@ -69,15 +71,17 @@ class AppDatabase private constructor() {
     /**
      * Deal with journal entries
      */
-    fun addJournalEntryListValueEventListener(valueEventListener: ValueEventListener) {
-        val dateOrderedLists = journalEntryNode.orderByChild("createdDate")
-        dateOrderedLists.addValueEventListener(valueEventListener)
+    fun addJournalEntryListValueEventListener(userId: String, valueEventListener: ValueEventListener) {
+        Timber.tag(TAG).d("Add journal entry list value event listener for userId $userId")
+        val userFilteredJournals = journalEntryNode.orderByChild("userId").equalTo(userId)
+        userFilteredJournals.addValueEventListener(valueEventListener)
     }
 
-    fun createJournalEntry(): String {
+    fun createJournalEntry(userId: String): String {
         val journalEntryKey = journalEntryNode.push().key
         val journalEntry = FirebaseJournalEntry(journalEntryId=journalEntryKey,
             createdDate=System.currentTimeMillis(),
+            userId=userId,
             entryText = ""
         )
         journalEntryNode.child(journalEntryKey!!).setValue(journalEntry)

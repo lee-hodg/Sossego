@@ -4,6 +4,8 @@ import com.google.firebase.database.IgnoreExtraProperties
 
 @IgnoreExtraProperties
 data class FirebaseJournalEntry(
+    val userId: String? = null,
+
     var journalEntryId: String? = null,
 
     var entryText: String = "",

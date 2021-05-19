@@ -9,8 +9,8 @@ import com.google.firebase.database.ValueEventListener
 class JournalRepository private constructor() : BaseRepository() {
 
 
-    fun addJournalEntryListValueEventListener(valueEventListener: ValueEventListener){
-        return mAppDatabase.addJournalEntryListValueEventListener(valueEventListener)
+    fun addJournalEntryListValueEventListener(userId: String, valueEventListener: ValueEventListener){
+        return mAppDatabase.addJournalEntryListValueEventListener(userId, valueEventListener)
     }
 
     fun addJournalEntryDetailValueEventListener(valueEventListener: ValueEventListener,
@@ -19,8 +19,8 @@ class JournalRepository private constructor() : BaseRepository() {
             journalEntryKey)
     }
 
-    fun createJournalEntry(): String {
-        return mAppDatabase.createJournalEntry()
+    fun createJournalEntry(userId: String): String {
+        return mAppDatabase.createJournalEntry(userId)
     }
 
     fun removeJournalEntry(journalEntryKey: String){

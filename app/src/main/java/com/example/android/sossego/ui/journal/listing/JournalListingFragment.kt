@@ -85,6 +85,7 @@ class JournalListingFragment : Fragment() {
             }
         })
 
+
         // Add an Observer on this variable to tell us when to navigate to the detail view
         // navigation is UI so is done in the fragment, but click-handler changes data on the
         // view model. The action takes the id of the gratitudeList whose detail we want to view.
@@ -124,12 +125,13 @@ class JournalListingFragment : Fragment() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                 val journalEntries : MutableList<FirebaseJournalEntry> = mutableListOf()
+                // Ensure the lists are reverse createdDate ordered
+                val sortedJournalEntries = dataSnapshot.children.sortedByDescending { "createdDate" }
 
-                for(journalEntry in dataSnapshot.children.reversed()) {
+                for(journalEntry in sortedJournalEntries) {
                     val item = journalEntry.getValue<FirebaseJournalEntry>()
                     journalEntries.add(item!!)
                 }
-
 
                 journalEntryListAdapter.submitJournalEntryList(journalEntries)
 
@@ -139,7 +141,15 @@ class JournalListingFragment : Fragment() {
                 Timber.d("onCancelled called")
             }
         }
-        journalRepository.addJournalEntryListValueEventListener(journalEntriesListener)
+        // Observe the authentication state so we can know if the user has logged in successfully.
+        // If the user has logged in successfully
+        loginViewModel.authenticationUserId.observe(viewLifecycleOwner, { authUserId ->
+            journalListingViewModel.setAuthenticatedUserId(authUserId)
+            when(authUserId){
+                null -> Timber.tag(TAG).d("Pretend to remove journal event listener")
+                else ->  journalRepository.addJournalEntryListValueEventListener(authUserId, journalEntriesListener)
+            }
+        })
 
         // Set our recyclerview to use this adapter
         binding.journalEntryListRecycler.adapter = journalEntryListAdapter

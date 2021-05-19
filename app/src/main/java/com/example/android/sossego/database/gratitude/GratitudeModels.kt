@@ -13,6 +13,7 @@ data class FirebaseGratitudeItem(
 
 @IgnoreExtraProperties
 data class FirebaseGratitudeList(
+    val userId: String = "",
     val gratitudeListId: String = "",
     val createdDate: Long = System.currentTimeMillis(),
     val gratitudeItems: Map<String, FirebaseGratitudeItem>? = null
