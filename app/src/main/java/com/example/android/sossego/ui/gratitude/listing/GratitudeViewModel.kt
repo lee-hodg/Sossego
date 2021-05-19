@@ -12,6 +12,8 @@ class GratitudeViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
+    // How many consecutive logins
+    var streakCount: Int = 1
 
     /**
               Navigation from list to detail
@@ -60,9 +62,19 @@ class GratitudeViewModel(
         _authenticatedUserId.value = userId
     }
 
+    private val _userDisplayName = MutableLiveData<String?>()
+    val userDisplayName
+        get() = _userDisplayName
+
+    fun setUserDisplayName(displayName: String?){
+        _userDisplayName.value = displayName
+    }
+
     init {
         _isUserAuthenticated.value = false
         _authenticatedUserId.value = null
+        _userDisplayName.value = null
+
     }
 
     private suspend fun insert(): String? {

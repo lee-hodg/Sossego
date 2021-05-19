@@ -22,6 +22,21 @@
     tools:context=".ui.gratitude.listing.GratitudeFragment">
 
         <TextView
+            android:id="@+id/greeting_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin"
+            android:padding="@dimen/padding_small"
+            app:layout_constraintBottom_toTopOf="@+id/quote_of_the_day_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:streakText="@{gratitudeViewModel.streakCount}"
+            app:userDisplayName="@{gratitudeViewModel.userDisplayName}"
+            app:visibleOrGone="@{gratitudeViewModel.isUserAuthenticated}"
+            tools:text="Welcome. Congratulations on your 200 day streak!" />
+
+        <TextView
             android:id="@+id/quote_of_the_day_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,10 +47,10 @@
             android:padding="@dimen/padding_small"
             app:formatQuote="@{quoteViewModel.latestQuote}"
             android:textStyle="italic"
+            app:layout_constraintTop_toBottomOf="@+id/greeting_tv"
             app:layout_constraintBottom_toTopOf="@+id/gratitude_list_recycler"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:text="A bird in the hand is worth two in the bush" />
 
         <androidx.recyclerview.widget.RecyclerView

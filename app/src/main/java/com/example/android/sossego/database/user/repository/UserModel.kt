@@ -10,3 +10,12 @@ data class User(
     var displayName: String? = "",
     var email: String? = ""
 )
+
+/**
+ * Track logins to display streak counts
+ **/
+@IgnoreExtraProperties
+data class UserLogin(
+    val uid: String = "",
+    val loginDate: Long = System.currentTimeMillis(),
+)

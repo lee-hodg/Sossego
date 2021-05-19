@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
@@ -25,6 +26,7 @@ import com.google.firebase.database.ktx.getValue
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import timber.log.Timber
+import java.util.*
 
 /**
  * This is responsible for the listing of gratitude lists which will be displayed
@@ -87,6 +89,10 @@ class GratitudeFragment : Fragment(), KoinComponent {
                     gratitudeViewModel.userLoggedOut()
                 }
             }
+        })
+        // Track user displayName
+        loginViewModel.userDisplayName.observe(viewLifecycleOwner, { displayName ->
+            gratitudeViewModel.setUserDisplayName(displayName)
         })
 
         // Make it accessible to the binding (remember the xml must have outer layout tag
@@ -195,6 +201,12 @@ class GratitudeFragment : Fragment(), KoinComponent {
             this, quoteViewModelFactory).get(QuotesViewModel::class.java)
 
         binding.quoteViewModel = quoteViewModel
+
+        // Set the streak count
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val counterAppOpenedPrefKey = requireContext().getString(R.string.app_opened_counter_preference_key)
+        gratitudeViewModel.streakCount = sharedPreferences.getInt(counterAppOpenedPrefKey, 1)
 
         return binding.root
     }

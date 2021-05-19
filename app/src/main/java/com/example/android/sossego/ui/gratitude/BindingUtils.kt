@@ -52,6 +52,17 @@ fun View.visibleOrInvisible(visible: Boolean) {
     visibility = if(visible) View.VISIBLE else View.INVISIBLE
 }
 
+fun getEmoji(unicode: Int): String {
+    return String(Character.toChars(unicode))
+}
+
+@BindingAdapter(value = ["streakText", "userDisplayName"], requireAll = true)
+fun TextView.setGreeting(streakCount: Int?, userDisplayName: String?) {
+    streakCount?.let {
+        text = "Welcome " + userDisplayName + ". Congratulations on your " + streakCount.toString() + " streak! " + getEmoji(0x1F525)
+    }
+}
+
 
 //@BindingAdapter("gratitudeTextChangedListener")
 //fun TextView.setGratitudeTextChangedListener(item: GratitudeItem?) {

@@ -7,10 +7,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.journal.repository.JournalRepository
@@ -32,6 +35,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -50,6 +54,31 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private val applicationScope = CoroutineScope(Dispatchers.Default)
 
+    private fun trackAppOpens(){
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val lastDayAppOpenedPrefKey = applicationContext.getString(R.string.last_day_opened_preference_key)
+        val counterAppOpenedPrefKey = applicationContext.getString(R.string.app_opened_counter_preference_key)
+
+        // Get the current day of the year
+        val c: Calendar = Calendar.getInstance()
+        val thisDay: Int = c.get(Calendar.DAY_OF_YEAR)
+
+        // Get the last login day (default 0) and current consecutive opens count (default 0)
+        val lastDay = sharedPreferences.getInt(lastDayAppOpenedPrefKey, 0)
+        var counterOfConsecutiveDays = sharedPreferences.getInt(counterAppOpenedPrefKey, 0)
+
+        if (lastDay == thisDay - 1) {
+            // If we have consecutive day opens then increase the count
+            counterOfConsecutiveDays += 1
+        } else {
+            // Else we must reset to 1
+            counterOfConsecutiveDays = 1
+        }
+        sharedPreferences.edit().putInt(lastDayAppOpenedPrefKey, thisDay).apply()
+        sharedPreferences.edit().putInt(counterAppOpenedPrefKey, counterOfConsecutiveDays).apply()
+
+        Timber.tag(TAG).d("Set the streak count to $counterOfConsecutiveDays")
+    }
 
     private fun initKoin() {
         val gratitudeModule = module {
@@ -118,6 +147,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Try to track app opens so we can display streaks
+        trackAppOpens()
+
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         }
@@ -152,6 +184,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
         })
+
 
     }
 
@@ -216,6 +249,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             FirebaseAuth.getInstance().currentUser?.displayName,
                             FirebaseAuth.getInstance().currentUser?.email)
                     }
+                    // Track Logins for analytics
+                    userRepository.createNewLogin(FirebaseAuth.getInstance().currentUser!!.uid)
                 }
             } else {
                 // Sign in failed. If response is null the user canceled the

@@ -11,6 +11,9 @@ class UserRepository private constructor() : BaseRepository() {
         return mAppDatabase.createNewUser(uid, displayName, email)
     }
 
+    fun createNewLogin(uid: String) {
+        mAppDatabase.createNewLogin(uid)
+    }
 
     companion object {
         private var instance: UserRepository? = null
