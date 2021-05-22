@@ -14,7 +14,7 @@ interface QuoteDatabaseDao {
     fun getAll(): LiveData<List<DatabaseQuote>>
 
     @Query("SELECT * FROM quote_table ORDER BY date DESC LIMIT 1")
-    fun getLatest(): LiveData<DatabaseQuote>
+    fun getLatest(): LiveData<DatabaseQuote?>
 
     @Query("SELECT * from quote_table where date(date/1000,'unixepoch') = date('now')  ORDER BY date DESC LIMIT 1")
     fun getTodayRecord(): DatabaseQuote?

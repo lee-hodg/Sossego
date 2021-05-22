@@ -18,11 +18,24 @@
     <string name="add_journal_entry_fab_content_description">Add a new journal entry</string>
     <string name="login_prompt">Please login below</string>
     <string name="login_btn">Login</string>
-    <string name="ogout">Logout</string>
+    <string name="logout">Logout</string>
     <string name="logout_txt">Logout</string>
     <string name="settings">Settings</string>
     <string name="please_login">Please Login</string>
     <string name="settings_enable_reminders">Enable reminder notifications</string>
     <string name="last_day_opened_preference_key">LAST_DAY_APP_OPENED</string>
     <string name="app_opened_counter_preference_key">APP_OPENS_PREF_KEY</string>
+    <string name="periodic_reminder">Time to do your actions!</string>
+    <string name="periodic_reminder_title">Sossego: time to do your actions!</string>
+    <string name="snooze">Snooze</string>
+    <string name="periodic_reminder_channel_id">sossego_reminder_channel</string>
+    <string name="channel_description">Sossego action reminders</string>
+    <string name="periodic_reminder_channel_name">"Sossego action reminders "</string>
+    <string name="reminders_enabled">REMINDERS_ENABLED</string>
+    <string name="reminder_hour">REMINDER_HOUR</string>
+    <string name="reminder_minute">REMINDER_MINUTE</string>
+    <string name="reminders_minute_text">Reminders minute</string>
+    <string name="periodic_reminder_body">A small amount of time each day can make a world of difference</string>
+    <string name="notification_hour_name">Notification Reminder Time</string>
+    <string name="notification_hour_description">%s. The time at which the daily actions reminder will be sent to you (if enabled). </string>
 </resources>

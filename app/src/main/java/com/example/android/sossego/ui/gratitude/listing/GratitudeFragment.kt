@@ -1,5 +1,9 @@
 package com.example.android.sossego.ui.gratitude.listing
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +28,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import timber.log.Timber
 import java.util.*
@@ -47,6 +52,31 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
     private lateinit var gratitudeListListener: ValueEventListener
 
+    private fun createChannel(channelId: String, channelName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                channelId,
+                channelName,
+                // Change importance
+                NotificationManager.IMPORTANCE_HIGH
+            )
+                // Disable badges for this channel
+                .apply {
+                    setShowBadge(false)
+                }
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = getString(R.string.channel_description)
+
+            val notificationManager = requireActivity().getSystemService(
+                NotificationManager::class.java
+            )
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -65,6 +95,11 @@ class GratitudeFragment : Fragment(), KoinComponent {
             savedInstanceState: Bundle?
     ): View {
 
+        // Channel for notifications
+        createChannel(
+            getString(R.string.periodic_reminder_channel_id),
+            getString(R.string.periodic_reminder_channel_name)
+        )
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentGratitudeBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_gratitude, container, false)

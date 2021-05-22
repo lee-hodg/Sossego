@@ -1,14 +1,17 @@
 package com.example.android.sossego
 
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -19,6 +22,7 @@ import com.example.android.sossego.database.gratitude.repository.GratitudeReposi
 import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.database.quotes.work.RefreshDataWorker
 import com.example.android.sossego.database.user.repository.UserRepository
+import com.example.android.sossego.receiver.AlarmReceiver
 import com.example.android.sossego.ui.gratitude.listing.GratitudeFragment
 import com.example.android.sossego.ui.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
@@ -39,6 +43,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
+
 class MainActivity : AppCompatActivity(), KoinComponent {
 
     companion object {
@@ -47,6 +52,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 //        const val SIGN_IN_RESULT_CODE = 1001
     }
 
+
     // Get a reference to the ViewModel scoped to this Fragment.
     private val loginViewModel: LoginViewModel by inject()
 
@@ -54,8 +60,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private val applicationScope = CoroutineScope(Dispatchers.Default)
 
+    private val requestCode = 0
+
     private fun trackAppOpens(){
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+            applicationContext)
+
         val lastDayAppOpenedPrefKey = applicationContext.getString(R.string.last_day_opened_preference_key)
         val counterAppOpenedPrefKey = applicationContext.getString(R.string.app_opened_counter_preference_key)
 
@@ -143,9 +153,81 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             repeatingRequest)
     }
 
+    fun setupRepeatingAlarm(){
+        /**
+         * Create a periodic alarm
+         * If the user has disabled alarms we do nothing
+         * If they set a time we schedule for then
+         */
+        Timber.tag(TAG).d("Setting up the repeating alarm...")
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+            applicationContext)
+
+        // What are the user's notification prefs?
+        val remindersEnabledKey = applicationContext.getString(R.string.reminders_enabled)
+        val reminderHourKey = applicationContext.getString(R.string.reminder_hour)
+        val reminderMinuteKey = applicationContext.getString(R.string.reminder_minute)
+        val remindersEnabled = sharedPreferences.getBoolean(remindersEnabledKey, false)
+        var reminderHour = sharedPreferences.getString(reminderHourKey, "9")
+        var reminderMinute = sharedPreferences.getString(reminderMinuteKey, "0")
+        if(reminderHour === null){
+            reminderHour = "9"
+        }
+        if(reminderMinute === null){
+            reminderMinute = "0"
+        }
+
+        if(!remindersEnabled){
+            Timber.tag(TAG).d("User does not have reminders enabled")
+            return
+        } else{
+            Timber.tag(TAG).d("Set alarm for $reminderHour:$reminderMinute...")
+        }
+
+        val notifyIntent = Intent(this, AlarmReceiver::class.java)
+        val notifyPendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            this,
+            requestCode,
+            notifyIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        // Ensure we remove any existing notifications
+        val notificationManager = ContextCompat.getSystemService(
+            this, NotificationManager::class.java
+        ) as NotificationManager
+        notificationManager.cancelNotifications()
+
+        // Set the alarm to start at approximately 9am
+        // Then daily at this time
+        val calendar: Calendar = Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis()
+            set(Calendar.HOUR_OF_DAY, reminderHour.toInt())
+            set(Calendar.MINUTE, reminderMinute.toInt())
+        }
+        alarmManager.setInexactRepeating(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            notifyPendingIntent
+        )
+
+//        alarmManager.setInexactRepeating(
+//            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//            SystemClock.elapsedRealtime() + INTERVAL_FIVE_SECONDS,
+//            INTERVAL_FIVE_SECONDS,
+//            notifyPendingIntent
+//        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Setup the alarm notifications
+        setupRepeatingAlarm()
 
         // Try to track app opens so we can display streaks
         trackAppOpens()

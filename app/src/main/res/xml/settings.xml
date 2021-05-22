@@ -15,11 +15,15 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen
-xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:defaultValue="true">
 
-<SwitchPreferenceCompat
-    app:key="notifications"
-    app:title="@string/settings_enable_reminders"/>
+    <SwitchPreferenceCompat
+        app:key="@string/reminders_enabled"
+        app:title="@string/settings_enable_reminders" />
+    <com.example.android.sossego.ui.settings.TimePickerPreference
+        android:layout="@layout/time_picker_row"
+        android:selectable="true" />
 
 </PreferenceScreen>

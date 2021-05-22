@@ -21,9 +21,9 @@ class QuotesRepository(private val database: QuoteDatabase) {
 //            it.asDomainModel()
 //        }
 
-    val latestQuote: LiveData<Quote> =
+    val latestQuote: LiveData<Quote?> =
         Transformations.map(database.quoteDatabaseDao.getLatest()) {
-            it.asDomainModel()
+            it?.asDomainModel()
         }
 
 
