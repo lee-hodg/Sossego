@@ -38,4 +38,6 @@
     <string name="periodic_reminder_body">A small amount of time each day can make a world of difference</string>
     <string name="notification_hour_name">Notification Reminder Time</string>
     <string name="notification_hour_description">%s. The time at which the daily actions reminder will be sent to you (if enabled). </string>
+    <string name="title_meditation">Meditation</string>
+    <string name="mediation_prompt">Choose a time</string>
 </resources>

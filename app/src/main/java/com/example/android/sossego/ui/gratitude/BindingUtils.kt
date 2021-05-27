@@ -1,5 +1,6 @@
 package com.example.android.sossego.ui.gratitude
 
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -59,9 +60,23 @@ fun getEmoji(unicode: Int): String {
 @BindingAdapter(value = ["streakText", "userDisplayName"], requireAll = true)
 fun TextView.setGreeting(streakCount: Int?, userDisplayName: String?) {
     streakCount?.let {
-        text = "Welcome " + userDisplayName + ". Congratulations on your " + streakCount.toString() + " streak! " + getEmoji(0x1F525)
+        text = "Welcome " + userDisplayName + ". Congratulations on your " + streakCount.toString() + " day streak! " + getEmoji(0x1F525)
     }
 }
+
+/**
+ * Converts milliseconds to formatted mm:ss
+ *
+ * @param value, time in milliseconds.
+ */
+@BindingAdapter("elapsedTime")
+fun TextView.setElapsedTime(value: Long?) {
+    if(value != null) {
+        val seconds = value / 1000
+        text = if (seconds < 60) seconds.toString() else DateUtils.formatElapsedTime(seconds)
+    }
+}
+
 
 
 //@BindingAdapter("gratitudeTextChangedListener")

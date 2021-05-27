@@ -243,7 +243,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_gratitude, R.id.navigation_journal, R.id.navigation_notifications
+                R.id.navigation_gratitude, R.id.navigation_journal, R.id.navigation_meditation
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

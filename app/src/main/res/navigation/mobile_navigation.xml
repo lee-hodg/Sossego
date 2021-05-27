@@ -66,10 +66,11 @@
 
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.android.sossego.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_meditation"
+        android:name="com.example.android.sossego.ui.meditation.MeditationFragment"
+        android:label="@string/title_meditation"
+        tools:layout="@layout/fragment_meditation" />
+
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.android.sossego.ui.settings.SettingsFragment"
