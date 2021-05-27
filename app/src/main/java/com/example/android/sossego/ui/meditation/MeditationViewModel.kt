@@ -26,7 +26,7 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
     companion object{
         private const val TAG = "MediationViewModel"
     }
-    private val requestCode = 0
+    private val requestCode = 1101
     private val triggerAtTime = "TRIGGER_AT"
 
     private val minute: Long = 60_000L
@@ -59,7 +59,7 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
     init {
         // determine if alarm state is on/off based on if there is a pending intent
         _alarmOn.value = PendingIntent.getBroadcast(
-            getApplication(),
+            app,
             requestCode,
             notifyIntent,
             PendingIntent.FLAG_NO_CREATE
@@ -70,7 +70,7 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
         // this in turn calls the notifyIntent for the real work which is the AlarmReceiver doing
         // the Toast
         notifyPendingIntent = PendingIntent.getBroadcast(
-            getApplication(),
+            app,
             requestCode,
             notifyIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -112,22 +112,20 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
      * Creates a new alarm, notification and timer
      */
     private fun startTimer(timerLengthSelection: Int) {
+        Timber.tag(TAG).d("startTimer...alarmOn.value is ${_alarmOn.value}")
         _alarmOn.value?.let {
             if (!it) {
                 // block runs when _alarmOn is false (can't start if already started)
                 // now set alarmOn
 
                 _alarmOn.value = true
-//                val selectedInterval = when (timerLengthSelection) {
-//                    0 -> second * 10 //For testing only
-//                    else ->timerLengthOptions[timerLengthSelection] * minute
-//                }
-                Timber.tag(TAG).d("startTimer: We have timerLengthSelection $timerLengthSelection")
-                val selectedInterval = timerLengthOptions[timerLengthSelection] * minute
+                // val selectedInterval = timerLengthOptions[timerLengthSelection] * minute
+                val selectedInterval = 10 * second
                 Timber.tag(TAG).d("startTimer: We set selectedInterval $selectedInterval")
 
                 val triggerTime = SystemClock.elapsedRealtime() + selectedInterval
 
+                Timber.tag(TAG).d("set Alarm with triggerTime $triggerTime")
                 AlarmManagerCompat.setExactAndAllowWhileIdle(
                     alarmManager,
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
