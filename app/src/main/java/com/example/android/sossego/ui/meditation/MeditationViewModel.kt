@@ -53,6 +53,9 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
     val isAlarmOn: LiveData<Boolean>
         get() = _alarmOn
 
+    private val _selectedInterval = MutableLiveData<Long>()
+    val selectedInterval: LiveData<Long>
+        get() = _selectedInterval
 
     private lateinit var timer: CountDownTimer
 
@@ -119,11 +122,11 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
                 // now set alarmOn
 
                 _alarmOn.value = true
-                // val selectedInterval = timerLengthOptions[timerLengthSelection] * minute
-                val selectedInterval = 10 * second
-                Timber.tag(TAG).d("startTimer: We set selectedInterval $selectedInterval")
+                _selectedInterval.value = timerLengthOptions[timerLengthSelection] * minute
+                //_selectedInterval.value = 10 * second
+                Timber.tag(TAG).d("startTimer: We set selectedInterval $_selectedInterval.value")
 
-                val triggerTime = SystemClock.elapsedRealtime() + selectedInterval
+                val triggerTime = SystemClock.elapsedRealtime() + _selectedInterval.value!!
 
                 Timber.tag(TAG).d("set Alarm with triggerTime $triggerTime")
                 AlarmManagerCompat.setExactAndAllowWhileIdle(

@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="mediationTimerViewModel"
             type="com.example.android.sossego.ui.meditation.MeditationTimerViewModel" />
@@ -16,29 +15,18 @@
         android:layout_height="match_parent"
         tools:context=".ui.MeditationFragment">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:elapsedTime="@{mediationTimerViewModel.elapsedTime}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/minutes_spinner" />
 
         <Spinner
             android:id="@+id/minutes_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
             android:entries="@array/time_array"
             android:onItemSelected="@{(parent, view, selection, id)-> mediationTimerViewModel.setTimeSelected(selection)}"
             android:prompt="@string/mediation_prompt"
             android:selectedItemPosition="@{mediationTimerViewModel.timeSelection}"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/on_off_switch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -47,16 +35,41 @@
             android:id="@+id/on_off_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"
             android:checked="@{mediationTimerViewModel.isAlarmOn}"
             android:onCheckedChanged="@{(button, on)-> mediationTimerViewModel.setAlarm(on)}"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/minutes_spinner"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/textView"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:textAppearance="@style/TextAppearance.AppCompat.Large"-->
+        <!--            app:elapsedTime="@{mediationTimerViewModel.elapsedTime}"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/minutes_spinner" />-->
+
+        <!--        app:elapsedTime="@{mediationTimerViewModel.elapsedTime}"-->
+
+        <com.example.android.sossego.customviews.TimerClockView
+            android:id="@+id/timerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            app:elapsedSeconds="@{mediationTimerViewModel.elapsedTime}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/minutes_spinner"
+            app:selectedInterval="@{mediationTimerViewModel.selectedInterval}" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
