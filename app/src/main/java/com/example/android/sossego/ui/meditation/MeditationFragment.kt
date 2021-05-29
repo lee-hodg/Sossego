@@ -27,6 +27,13 @@ class MeditationFragment : Fragment() {
         binding.mediationTimerViewModel = viewModel
         binding.lifecycleOwner = this.viewLifecycleOwner
 
+        val numbers = arrayOfNulls<String>(20)
+        for (i in 1..20) numbers[i-1] = i.toString()
+
+        binding.numberPicker.minValue = 1
+        binding.numberPicker.maxValue = 20
+        binding.numberPicker.displayedValues = numbers
+        binding.numberPicker.value = 1
         return binding.root
     }
 }

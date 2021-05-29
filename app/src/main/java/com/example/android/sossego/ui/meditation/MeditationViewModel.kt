@@ -122,7 +122,8 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
                 // now set alarmOn
 
                 _alarmOn.value = true
-                _selectedInterval.value = timerLengthOptions[timerLengthSelection] * minute
+//                _selectedInterval.value = timerLengthOptions[timerLengthSelection] * minute
+                _selectedInterval.value = timerLengthSelection * minute
                 //_selectedInterval.value = 10 * second
                 Timber.tag(TAG).d("startTimer: We set selectedInterval $_selectedInterval.value")
 
