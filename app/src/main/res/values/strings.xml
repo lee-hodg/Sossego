@@ -40,4 +40,5 @@
     <string name="notification_hour_description">%s. The time at which the daily actions reminder will be sent to you (if enabled). </string>
     <string name="title_meditation">Meditation</string>
     <string name="mediation_prompt">Choose a time</string>
+    <string name="play_pause_button_content_description">Play-pause button</string>
 </resources>

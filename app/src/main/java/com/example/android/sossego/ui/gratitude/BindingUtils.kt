@@ -2,8 +2,10 @@ package com.example.android.sossego.ui.gratitude
 
 import android.text.format.DateUtils
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.example.android.sossego.R
 import com.example.android.sossego.convertLongToDateString
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.quotes.domain.Quote
@@ -78,6 +80,15 @@ fun TextView.setElapsedTime(value: Long?) {
 }
 
 
+@BindingAdapter("playImage")
+fun ImageView.setPlayImage(alarmOn: Boolean) {
+    var drawableRes = R.drawable.outline_play_circle_outline_24
+    if(alarmOn){
+        drawableRes = R.drawable.outline_pause_24
+    }
+
+    this.setImageResource(drawableRes)
+}
 
 //@BindingAdapter("gratitudeTextChangedListener")
 //fun TextView.setGratitudeTextChangedListener(item: GratitudeItem?) {

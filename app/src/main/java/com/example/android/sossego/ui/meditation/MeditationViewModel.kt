@@ -101,6 +101,20 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun toggleAlarm() {
+        when (_alarmOn.value) {
+            true -> {
+                // Switch to off if already on
+                cancelNotification()
+                _alarmOn.value = false
+            }
+            false -> {
+                // switch to on if off
+                timeSelection.value?.let { startTimer(it) }
+            }
+        }
+    }
+
     /**
      * Sets the desired interval for the alarm
      *
