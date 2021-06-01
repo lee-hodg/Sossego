@@ -31,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{()-> mediationTimerViewModel.toggleAlarm()}"
+            android:contentDescription="@string/play_or_pause_the_timer"
             app:layout_constraintBottom_toTopOf="@+id/timerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/number_picker"
@@ -90,12 +91,37 @@
             android:layout_marginBottom="32dp"
             android:paddingTop="@dimen/padding_small"
             app:elapsedSeconds="@{mediationTimerViewModel.elapsedTime}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/waterView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/number_picker"
             app:selectedInterval="@{mediationTimerViewModel.selectedInterval}" />
 
+
+        <com.example.android.sossego.customviews.WaterLevelView
+            android:id="@+id/waterView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="32dp"
+            app:fractionRemaining="@{mediationTimerViewModel.fractionRemaining}"
+            app:layoutDescription="@xml/water_scene"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timerView"
+           />
+
+<!--        <ImageView-->
+<!--            android:id="@+id/dropletView"-->
+<!--            android:layout_width="20dp"-->
+<!--            android:layout_height="20dp"-->
+<!--            android:visibility="gone"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:srcCompat="@drawable/ic_droplet"-->
+<!--            tools:layout_editor_absoluteX="12dp"-->
+<!--            android:contentDescription="@string/water_droplet" />-->
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

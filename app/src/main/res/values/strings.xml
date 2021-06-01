@@ -41,4 +41,7 @@
     <string name="title_meditation">Meditation</string>
     <string name="mediation_prompt">Choose a time</string>
     <string name="play_pause_button_content_description">Play-pause button</string>
+    <string name="water_waves_background_image">Water waves background image</string>
+    <string name="play_or_pause_the_timer">play or pause the timer</string>
+    <string name="water_droplet">Water droplet</string>
 </resources>

@@ -42,24 +42,37 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
     private val notifyIntent = Intent(app, MeditationAlarmReceiver::class.java)
 
     private val _timeSelection = MutableLiveData<Int>()
-    val timeSelection: LiveData<Int>
+    private val timeSelection: LiveData<Int>
         get() = _timeSelection
 
     private val _elapsedTime = MutableLiveData<Long>()
     val elapsedTime: LiveData<Long>
         get() = _elapsedTime
 
+    private val _fractionRemaining = MutableLiveData<Float>()
+    val fractionRemaining: LiveData<Float>
+        get() = _fractionRemaining
+
     private var _alarmOn = MutableLiveData<Boolean>()
     val isAlarmOn: LiveData<Boolean>
         get() = _alarmOn
+
 
     private val _selectedInterval = MutableLiveData<Long>()
     val selectedInterval: LiveData<Long>
         get() = _selectedInterval
 
+
+
     private lateinit var timer: CountDownTimer
 
     init {
+        _fractionRemaining.value = 1.0f
+
+        _selectedInterval.value = 1L
+
+        _elapsedTime.value = 0L
+
         // determine if alarm state is on/off based on if there is a pending intent
         _alarmOn.value = PendingIntent.getBroadcast(
             app,
@@ -87,18 +100,6 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
             createTimer()
         }
 
-    }
-
-    /**
-     * Turns on or off the alarm
-     *
-     * @param isChecked, alarm status to be set.
-     */
-    fun setAlarm(isChecked: Boolean) {
-        when (isChecked) {
-            true -> timeSelection.value?.let { startTimer(it) }
-            false -> cancelNotification()
-        }
     }
 
     fun toggleAlarm() {
@@ -170,6 +171,12 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
             timer = object : CountDownTimer(triggerTime, second) {
                 override fun onTick(millisUntilFinished: Long) {
                     _elapsedTime.value = triggerTime - SystemClock.elapsedRealtime()
+                    val elapsedTimeValue = _elapsedTime.value?.toFloat()
+                    val selectIntervalValue = _selectedInterval.value?.toFloat()
+                    if(selectIntervalValue != null && selectIntervalValue!= 0.0f && elapsedTimeValue != null) {
+                        _fractionRemaining.value = elapsedTimeValue/selectIntervalValue
+                    }
+
                     if (_elapsedTime.value!! <= 0) {
                         resetTimer()
                     }
@@ -198,6 +205,7 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
         timer.cancel()
         _elapsedTime.value = 0
         _alarmOn.value = false
+        _fractionRemaining.value = 0.0f
     }
 
     private suspend fun saveTime(triggerTime: Long) =
