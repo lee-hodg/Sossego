@@ -86,11 +86,6 @@ class WaterLevelView @JvmOverloads constructor(
         val containerW = container.width
         val containerH = container.height
 
-
-        var dropletW = 9.0f
-        var dropletH = 12.0f
-
-
         for (n in 1..20) {
 
             val newDroplet = AppCompatImageView(this.context)

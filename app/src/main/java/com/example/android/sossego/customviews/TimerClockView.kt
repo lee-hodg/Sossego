@@ -9,7 +9,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import timber.log.Timber
 
-private const val DISPLAY_THRESHOLD = 0.01f
+private const val DISPLAY_THRESHOLD = 0.0001f
 
 class TimerClockView @JvmOverloads constructor(
     context: Context,
@@ -88,18 +88,18 @@ class TimerClockView @JvmOverloads constructor(
         if(elapsedSeconds != 0L && selectedInterval != 0L) {
             val elapsedSecondsTemp = elapsedSeconds/1000
             // fraction of the interval elapsed determines the sweepAngle (degrees)
-            val fractionRemaining = 1.0f - (elapsedSeconds.toFloat()/selectedInterval.toFloat())
-            Timber.tag(TAG).d("fractionRemaining is $fractionRemaining")
-            if(fractionRemaining < DISPLAY_THRESHOLD){
+            val fractionComplete = 1.0f - (elapsedSeconds.toFloat()/selectedInterval.toFloat())
+            Timber.tag(TAG).d("fractionComplete is $fractionComplete")
+            if(fractionComplete == 0.0f){
                 canvas.drawColor(Color.WHITE)
             }else {
                 // Draw the donut.
                 canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), outerRadius, donutPaint)
                 canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, circlePaint)
 
-                val sweepAngle = 360.0f * fractionRemaining
+                val sweepAngle = 360.0f * fractionComplete
                 Timber.tag(TAG)
-                    .d("draw w/ fractionRemaining $fractionRemaining and sweepAngle $sweepAngle")
+                    .d("draw w/ fractionComplete $fractionComplete and sweepAngle $sweepAngle")
                 canvas.drawArc(
                     (width / 2).toFloat() - outerRadius,
                     (height / 2).toFloat() - outerRadius,
