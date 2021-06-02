@@ -9,6 +9,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import timber.log.Timber
 
+private const val DISPLAY_THRESHOLD = 0.01f
 
 class TimerClockView @JvmOverloads constructor(
     context: Context,
@@ -82,33 +83,47 @@ class TimerClockView @JvmOverloads constructor(
         val arcThickness = radius * 0.10f
         val outerRadius = radius + arcThickness
 
-        // Draw the donut.
-        canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), outerRadius, donutPaint)
-        canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, circlePaint)
-
         Timber.tag(TAG).d("Got elapsedSeconds $elapsedSeconds and selectedInterval $selectedInterval")
 
         if(elapsedSeconds != 0L && selectedInterval != 0L) {
             val elapsedSecondsTemp = elapsedSeconds/1000
             // fraction of the interval elapsed determines the sweepAngle (degrees)
-            val fractionComplete = 1.0f - (elapsedSeconds.toFloat()/selectedInterval.toFloat())
-            val sweepAngle = 360.0f * fractionComplete
-            Timber.tag(TAG).d("draw w/ fractionComplete $fractionComplete and sweepAngle $sweepAngle")
-            canvas.drawArc((width / 2).toFloat()- outerRadius,
-                (height / 2).toFloat() - outerRadius,
-                (width / 2).toFloat() + outerRadius,
-                (height / 2).toFloat() +outerRadius,
-                -90.0f, -sweepAngle, true, textPaint)
+            val fractionRemaining = 1.0f - (elapsedSeconds.toFloat()/selectedInterval.toFloat())
+            Timber.tag(TAG).d("fractionRemaining is $fractionRemaining")
+            if(fractionRemaining < DISPLAY_THRESHOLD){
+                canvas.drawColor(Color.WHITE)
+            }else {
+                // Draw the donut.
+                canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), outerRadius, donutPaint)
+                canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, circlePaint)
 
-            canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, circlePaint)
-
-            // Draw timer text at center
-            val timeText =
-                if (elapsedSecondsTemp < 60) elapsedSecondsTemp.toString() else DateUtils.formatElapsedTime(
-                    elapsedSecondsTemp
+                val sweepAngle = 360.0f * fractionRemaining
+                Timber.tag(TAG)
+                    .d("draw w/ fractionRemaining $fractionRemaining and sweepAngle $sweepAngle")
+                canvas.drawArc(
+                    (width / 2).toFloat() - outerRadius,
+                    (height / 2).toFloat() - outerRadius,
+                    (width / 2).toFloat() + outerRadius,
+                    (height / 2).toFloat() + outerRadius,
+                    -90.0f, -sweepAngle, true, textPaint
                 )
-            Timber.tag(TAG).d("Got elapsedSecondsTemp $elapsedSecondsTemp so set timeText $timeText")
-            canvas.drawText(timeText, (width / 2).toFloat(), (height / 2).toFloat(), textPaint)
+
+                canvas.drawCircle(
+                    (width / 2).toFloat(),
+                    (height / 2).toFloat(),
+                    radius,
+                    circlePaint
+                )
+
+                // Draw timer text at center
+                val timeText =
+                    if (elapsedSecondsTemp < 60) elapsedSecondsTemp.toString() else DateUtils.formatElapsedTime(
+                        elapsedSecondsTemp
+                    )
+                Timber.tag(TAG)
+                    .d("Got elapsedSecondsTemp $elapsedSecondsTemp so set timeText $timeText")
+                canvas.drawText(timeText, (width / 2).toFloat(), (height / 2).toFloat(), textPaint)
+            }
         }
 
     }
