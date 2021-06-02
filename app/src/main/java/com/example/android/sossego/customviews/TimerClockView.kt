@@ -86,7 +86,7 @@ class TimerClockView @JvmOverloads constructor(
         canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), outerRadius, donutPaint)
         canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, circlePaint)
 
-        Timber.tag(TAG).d("Got elapsedSeconds $elapsedSeconds and selectedInt $selectedInterval")
+        Timber.tag(TAG).d("Got elapsedSeconds $elapsedSeconds and selectedInterval $selectedInterval")
 
         if(elapsedSeconds != 0L && selectedInterval != 0L) {
             val elapsedSecondsTemp = elapsedSeconds/1000

@@ -145,9 +145,14 @@ class WaterLevelView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        Timber.tag(TAG).d("Got fraction $fractionRemaining")
+        Timber.tag(TAG).d("onDraw got fraction $fractionRemaining")
 
-        if(fractionRemaining != 1.0f) {
+        if(fractionRemaining == 0.0f){
+            Timber.tag(TAG).d("fractionRemaining not 0.0 so clear white")
+            //clear
+            canvas.drawColor(Color.WHITE)
+        }else if(fractionRemaining != 1.0f) {
+                Timber.tag(TAG).d("fractionRemaining not 1.0 so drawing water")
                 waterHeight = fractionRemaining * (this.height - waveSurfaceHeight)
                 Timber.tag(TAG).d("draw w/ fractionRemaining $fractionRemaining and waterHeight $waterHeight")
                 canvas.drawRect(0.0f, waterHeight, width.toFloat(), height.toFloat(),
@@ -162,9 +167,6 @@ class WaterLevelView @JvmOverloads constructor(
 
                 shower()
 
-        }else if(fractionRemaining == 0.0f){
-            //clear
-            canvas.drawColor(Color.WHITE)
         }
 
 
