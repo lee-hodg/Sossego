@@ -17,6 +17,13 @@
             app:popEnterAnim="@anim/slide_in_right"
             app:popUpTo="@id/navigation_gratitude"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_navigation_gratitude_to_navigation_journal"
+            app:destination="@id/navigation_journal"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/fui_slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/fui_slide_out_left" />
     </fragment>
     <fragment
         android:id="@+id/gratitudeDetailFragment"
@@ -46,6 +53,13 @@
             app:popEnterAnim="@anim/slide_in_right"
             app:popUpTo="@id/navigation_journal"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_navigation_journal_to_navigation_meditation"
+            app:destination="@id/navigation_meditation"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/fui_slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/fui_slide_out_left" />
     </fragment>
     <fragment
         android:id="@+id/journalEntryDetailFragment"

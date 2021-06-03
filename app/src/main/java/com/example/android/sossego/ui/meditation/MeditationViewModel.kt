@@ -5,16 +5,19 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.CountDownTimer
 import android.os.SystemClock
 import androidx.core.app.AlarmManagerCompat
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
+import com.example.android.sossego.R
 import com.example.android.sossego.receiver.MeditationAlarmReceiver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.math.floor
 
 
 private const val MINUTE: Long = 60_000L
@@ -67,6 +70,17 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
     private val _fractionRemaining = MediatorLiveData<Float>()
     val fractionRemaining: LiveData<Float>
         get() = _fractionRemaining
+
+
+    private var mMediaPlayer: MediaPlayer? = null
+
+    private fun playSound() {
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(app.applicationContext, R.raw.tibetan_bell)
+            mMediaPlayer!!.isLooping = false
+            mMediaPlayer!!.start()
+        } else mMediaPlayer!!.start()
+    }
 
 
     /**
@@ -223,6 +237,17 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
             timer = object : CountDownTimer(triggerTime, SECOND) {
                 override fun onTick(millisUntilFinished: Long) {
                     _remainingTimeMilliseconds.value = triggerTime - SystemClock.elapsedRealtime()
+                    val remainingTimeVal = _remainingTimeMilliseconds.value
+                    if(remainingTimeVal != null) {
+                        val modVal = floor((remainingTimeVal.toFloat() / 1000.0f) % 60.0f)
+                        // Each minute play bell
+                        Timber.tag(TAG).d("Computed modVal $modVal from $remainingTimeVal")
+                        if(modVal == 0.0f) {
+                            Timber.tag(TAG).d("Hit that cymbal")
+                            playSound()
+                        }
+                    }
+
                     // If it's over already then resetTimer
                     if (_remainingTimeMilliseconds.value!! <= 0) {
                         Timber.tag(TAG).d("no remaining milliseconds (${_remainingTimeMilliseconds.value}): turn alarm off")
