@@ -15,15 +15,17 @@
         android:layout_height="match_parent"
         tools:context=".ui.MeditationFragment">
 
+<!--        android:onValueChange="@{(picker,oldv,newv) -> mediationTimerViewModel.setTimeSelected(newv)}"-->
         <NumberPicker
             android:id="@+id/number_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"
-            android:onValueChange="@{(picker,oldv,newv) -> mediationTimerViewModel.setTimeSelected(newv)}"
+            android:value="@={mediationTimerViewModel.timeSelection}"
             app:layout_constraintEnd_toStartOf="@id/on_off_switch"
             app:layout_constraintStart_toStartOf="parent"
+            android:enabled="@{!mediationTimerViewModel.isAlarmOn}"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
@@ -40,49 +42,6 @@
             tools:srcCompat="@drawable/outline_play_circle_outline_24" />
 
 
-<!--        <Spinner-->
-<!--            android:id="@+id/minutes_spinner"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="32dp"-->
-<!--            android:layout_marginTop="32dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:entries="@array/time_array"-->
-<!--            android:onItemSelected="@{(parent, view, selection, id)-> mediationTimerViewModel.setTimeSelected(selection)}"-->
-<!--            android:prompt="@string/mediation_prompt"-->
-<!--            android:selectedItemPosition="@{mediationTimerViewModel.timeSelection}"-->
-<!--            app:layout_constraintEnd_toStartOf="@id/on_off_switch"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--        <Switch-->
-<!--            android:id="@+id/on_off_switch"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="32dp"-->
-<!--            android:layout_marginEnd="32dp"-->
-<!--            android:checked="@{mediationTimerViewModel.isAlarmOn}"-->
-<!--            android:onCheckedChanged="@{(button, on)-> mediationTimerViewModel.setAlarm(on)}"-->
-<!--            app:layout_constraintBottom_toBottomOf="@+id/number_picker"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toEndOf="@+id/number_picker"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            tools:ignore="UseSwitchCompatOrMaterialXml" />-->
-
-
-        <!--        <TextView-->
-        <!--            android:id="@+id/textView"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:textAppearance="@style/TextAppearance.AppCompat.Large"-->
-        <!--            app:elapsedTime="@{mediationTimerViewModel.elapsedTime}"-->
-        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintStart_toStartOf="parent"-->
-        <!--            app:layout_constraintTop_toBottomOf="@id/minutes_spinner" />-->
-
-        <!--        app:elapsedTime="@{mediationTimerViewModel.elapsedTime}"-->
-
         <com.example.android.sossego.customviews.TimerClockView
             android:id="@+id/timerView"
             android:layout_width="0dp"
@@ -90,12 +49,12 @@
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"
             android:paddingTop="@dimen/padding_small"
-            app:elapsedSeconds="@{mediationTimerViewModel.elapsedTime}"
+            app:remainingTimeMilliseconds="@{mediationTimerViewModel.remainingTimeMilliseconds}"
             app:layout_constraintBottom_toTopOf="@+id/waterView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/number_picker"
-            app:selectedInterval="@{mediationTimerViewModel.selectedInterval}" />
+            app:fractionRemaining="@{mediationTimerViewModel.fractionRemaining}" />
 
 
         <com.example.android.sossego.customviews.WaterLevelView
@@ -110,19 +69,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/timerView"
            />
-
-<!--        <ImageView-->
-<!--            android:id="@+id/dropletView"-->
-<!--            android:layout_width="20dp"-->
-<!--            android:layout_height="20dp"-->
-<!--            android:visibility="gone"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            app:srcCompat="@drawable/ic_droplet"-->
-<!--            tools:layout_editor_absoluteX="12dp"-->
-<!--            android:contentDescription="@string/water_droplet" />-->
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

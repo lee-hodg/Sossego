@@ -55,12 +55,9 @@ class WaterLevelView @JvmOverloads constructor(
 
     private val destRect = Rect(0, 0, 0, 0)
 
-
-    private var _fractionRemaining: Float = 0.0f
-    var fractionRemaining: Float
-        get() = _fractionRemaining
+    var fractionRemaining: Float = 0.0f
         set(value) {
-            _fractionRemaining = value
+            field = value
             invalidate()
         }
 
@@ -140,28 +137,21 @@ class WaterLevelView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        Timber.tag(TAG).d("onDraw got fraction $fractionRemaining")
-
-        if(fractionRemaining == 0.0f){
-            Timber.tag(TAG).d("fractionRemaining not 0.0 so clear white")
+        if(fractionRemaining == 0.0f || fractionRemaining == 1.0f){
+            Timber.tag(TAG).d("fractionRemaining $fractionRemaining clear canvas")
             //clear
             canvas.drawColor(Color.WHITE)
-        }else if(fractionRemaining != 1.0f) {
-                Timber.tag(TAG).d("fractionRemaining not 1.0 so drawing water")
-                waterHeight = fractionRemaining * (this.height - waveSurfaceHeight)
-                Timber.tag(TAG).d("draw w/ fractionRemaining $fractionRemaining and waterHeight $waterHeight")
-                canvas.drawRect(0.0f, waterHeight, width.toFloat(), height.toFloat(),
-                    waterPaint)
-
-                val waterBitmap = waterDrawable?.let { drawableToBitmap(it) }
-                if (waterBitmap != null) {
-                    destRect.set(0, (waterHeight - waveSurfaceHeight).toInt(), width, (waterHeight+1).toInt())
-                    Timber.tag(TAG).d("Draw bitmap with ${destRect.left} x ${destRect.top} and ${destRect.right}x${destRect.bottom}")
-                    canvas.drawBitmap(waterBitmap, null, destRect, null)
-                }
-
-                shower()
-
+        }else {
+            waterHeight = fractionRemaining * (this.height - waveSurfaceHeight)
+            Timber.tag(TAG).d("fractionRemaining $fractionRemaining: draw water/shower")
+            canvas.drawRect(0.0f, waterHeight, width.toFloat(), height.toFloat(),
+                waterPaint)
+            val waterBitmap = waterDrawable?.let { drawableToBitmap(it) }
+            if (waterBitmap != null) {
+                destRect.set(0, (waterHeight - waveSurfaceHeight).toInt(), width, (waterHeight+1).toInt())
+                canvas.drawBitmap(waterBitmap, null, destRect, null)
+            }
+            shower()
         }
 
 

@@ -8,12 +8,8 @@ import android.content.Intent
 import android.os.CountDownTimer
 import android.os.SystemClock
 import androidx.core.app.AlarmManagerCompat
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
-import com.example.android.sossego.R
 import com.example.android.sossego.receiver.MeditationAlarmReceiver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,84 +17,169 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
-class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
+private const val MINUTE: Long = 60_000L
+private const val SECOND: Long = 1_000L
+private const val requestCode = 1101
+private const val triggerAtTime = "TRIGGER_AT"
+private const val timeSelectionKey = "SELECTED_TIME"
+
+
+class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
 
     companion object{
         private const val TAG = "MediationViewModel"
     }
-    private val requestCode = 1101
-    private val triggerAtTime = "TRIGGER_AT"
-    private val selectedIntervalKey = "SELECTED_INTERVAL"
 
-    private val minute: Long = 60_000L
-    private val second: Long = 1_000L
-
-    private val timerLengthOptions: IntArray
-    private val notifyPendingIntent: PendingIntent
+    private var notifyPendingIntent: PendingIntent? = null
 
     private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     private val prefs = PreferenceManager.getDefaultSharedPreferences(app.applicationContext)
 
     private val notifyIntent = Intent(app, MeditationAlarmReceiver::class.java)
+    private lateinit var timer: CountDownTimer
 
-    private val _timeSelection = MutableLiveData<Int>()
-    private val timeSelection: LiveData<Int>
-        get() = _timeSelection
 
-    private val _elapsedTime = MutableLiveData<Long>()
-    val elapsedTime: LiveData<Long>
-        get() = _elapsedTime
-
-    private val _fractionRemaining = MutableLiveData<Float>()
-    val fractionRemaining: LiveData<Float>
-        get() = _fractionRemaining
-
+    /*
+     *      Variables to do with alarm and countdown timer
+     */
+    // Is the alarm set to on/off
+    private var existingAlarm: Boolean = false
     private var _alarmOn = MutableLiveData<Boolean>()
     val isAlarmOn: LiveData<Boolean>
         get() = _alarmOn
 
+    // How much time is remaining in milliseconds
+    private val _remainingTimeMilliseconds = MutableLiveData(MINUTE)
+    val remainingTimeMilliseconds: LiveData<Long>
+        get() = _remainingTimeMilliseconds
 
-    private val _selectedInterval = MutableLiveData<Long>()
-    val selectedInterval: LiveData<Long>
-        get() = _selectedInterval
+    val timeSelection = MutableLiveData(1)
+
+//    // How many minutes did the user select
+//    val timeSelection: MutableLiveData<Int>
+//        get() = _timeSelection
+
+    // The interval in milliseconds (a simple transformation of the minutes count selected)
+    private val intervalMilliseconds = Transformations.map(timeSelection) { it * MINUTE }
 
 
+    private val _fractionRemaining = MediatorLiveData<Float>()
+    val fractionRemaining: LiveData<Float>
+        get() = _fractionRemaining
 
-    private lateinit var timer: CountDownTimer
+
+    /**
+     * This method is responsible for dynamically computing the fraction remaining
+     */
+    private fun computeFractionRemaining(){
+        if(_alarmOn.value == false){
+            _fractionRemaining.value = 1.0f
+        }else {
+            val intervalMillisecondsVal = intervalMilliseconds.value?.toFloat()
+            val remainingTimeMillisecondsVal = _remainingTimeMilliseconds.value?.toFloat()
+            if (intervalMillisecondsVal != null && intervalMillisecondsVal != 0.0f && remainingTimeMillisecondsVal != null) {
+                _fractionRemaining.value = remainingTimeMillisecondsVal / intervalMillisecondsVal
+                Timber.tag(TAG).d("Computed fraction remaining as ${_fractionRemaining.value} using intervalMillisecondsVal $intervalMillisecondsVal and remainingTimeMillisecondsVal $remainingTimeMillisecondsVal")
+            } else {
+                _fractionRemaining.value = 1.0f
+            }
+        }
+        Timber.tag(TAG).d("Computed fraction remaining as ${_fractionRemaining.value}")
+    }
 
     init {
-        if(fractionRemaining.value === null) {
-            Timber.tag(TAG).d("Init set _fractionRemaining to 1")
-            _fractionRemaining.value = 1.0f
-        }
-        if(_selectedInterval.value === null) {
-            Timber.tag(TAG).d("Init set _selectedInterval to 1")
-            _selectedInterval.value = 1 * minute
-        }
-        if(_timeSelection.value === null) {
-            Timber.tag(TAG).d("Init set _timeSelection to 1")
-            _timeSelection.value = 1
-        }
-        if(_elapsedTime.value === null) {
-            Timber.tag(TAG).d("Init set _elapsedTime to 0")
-            _elapsedTime.value = 0L
-        }
 
-        // determine if alarm state is on/off based on if there is a pending intent
-        _alarmOn.value = PendingIntent.getBroadcast(
+        // Add the sources for the fraction remaining mediator live data
+        _fractionRemaining.addSource(intervalMilliseconds) { computeFractionRemaining() }
+        _fractionRemaining.addSource(_remainingTimeMilliseconds) { computeFractionRemaining() }
+
+        // Determine if alarm state is on/off based on if there is a pending intent
+        // This doesn't create a PendingIntent (FLAG_NO_CREATE), it just checks if one exists
+        // If one does not, getBroadcast returns null, and _alarmOn.value set to false
+        // else if one does exist _alarmOn.value set to true
+        // Let's say we navigate away and come back. The existence of the pending intent
+        // tells us the alarm is on, then we can reload triggerTime and interval selected
+        // to do setup again and act accordingly
+        existingAlarm = PendingIntent.getBroadcast(
             app,
             requestCode,
             notifyIntent,
             PendingIntent.FLAG_NO_CREATE
         ) != null
 
-        Timber.tag(TAG).d("In init we determined that _alarmOn has value ${_alarmOn.value}")
+        _alarmOn.value = existingAlarm
 
-        // One uses PendingIntent.getBroadcast() to call a broadcast receiver when the alarm
-        // goes off and inside that receiver the service to do the real work is started.
-        // this in turn calls the notifyIntent for the real work which is the AlarmReceiver doing
-        // the Toast
+        if (existingAlarm) {
+            // We don't create another PendingIntent/setAlarm/saveTimes because
+            // they already exist, but we do call createTimer, which will
+            // load any saved params and start the countdown which
+            // continues the UI
+            createTimer()
+        } else {
+            // So that when user returns we get same as before
+            viewModelScope.launch {
+                timeSelection.value= loadTimeSelection()
+            }
+        }
+
+        Timber.tag(TAG).d("init: we determined that existingAlarm $existingAlarm")
+
+    }
+
+    private fun onFinishedTimer(){
+        // Alarm is off so make sure we cancel the pendingIntent
+        Timber.tag(TAG).d("cancel timer")
+        timer.cancel()
+        _remainingTimeMilliseconds.value = 0
+    }
+
+    private fun onAlarmOff(){
+        // Get the PI and kill it if exists (use FLAG NO CREATE so we do not create if no there)
+        val killPendingIntent = PendingIntent.getBroadcast(
+            app,
+            requestCode,
+            notifyIntent,
+            PendingIntent.FLAG_NO_CREATE
+        )
+
+        if(killPendingIntent != null) {
+            Timber.tag(TAG).d("Killing pending intent")
+            killPendingIntent.cancel()
+            alarmManager.cancel(killPendingIntent)
+        }else{
+            Timber.tag(TAG).d("No pending intent found to kill")
+        }
+
+        Timber.tag(TAG).d("Set alarmOn to false")
+        _alarmOn.value = false
+
+        onFinishedTimer()
+    }
+
+    /*
+    Allows a change in alarm state from the UI
+     */
+    fun toggleAlarm() {
+        Timber.tag(TAG).d("toggleAlarm called: w/ _alarmOn.value ${_alarmOn.value}")
+        when(_alarmOn.value) {
+            true-> {
+                onAlarmOff()
+            }
+            else-> {
+                // Alarm was off
+                setAlarmAndStartTimer()
+            }}
+    }
+
+    /**
+     * Creates a new alarm, notification and timer
+     */
+    private fun setAlarmAndStartTimer() {
+        Timber.tag(TAG).d("startTimer..")
+
+        _alarmOn.value = true
+
         notifyPendingIntent = PendingIntent.getBroadcast(
             app,
             requestCode,
@@ -106,77 +187,24 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        timerLengthOptions = app.resources.getIntArray(
-            R.array.mediation_minutes_array)
+        val triggerTime = SystemClock.elapsedRealtime() + intervalMilliseconds.value!!
+        Timber.tag(TAG).d("startTimer: We have _intervalMilliseconds ${intervalMilliseconds.value} and timeSelection ${timeSelection.value}")
+        Timber.tag(TAG).d("set Alarm with triggerTime $triggerTime")
 
-        //If alarm is not null, resume the timer back for this alarm
-        if (_alarmOn.value!!) {
-            Timber.tag(TAG).d("In init we launch with createTimer()...")
-            createTimer()
+        AlarmManagerCompat.setExactAndAllowWhileIdle(
+            alarmManager,
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            triggerTime,
+            notifyPendingIntent!!
+        )
+
+
+        viewModelScope.launch {
+            // if we navigate away and then back saving these let us resume
+            saveTime(triggerTime)
+            timeSelection.value?.let { it -> savedTimeSelection(it) }
         }
 
-    }
-
-    fun toggleAlarm() {
-        Timber.tag(TAG).d("toggleAlarm called")
-        when (_alarmOn.value) {
-            true -> {
-                // Switch to off if already on
-                Timber.tag(TAG).d("turn alarmOn to false and cancelNotifications")
-                cancelNotification()
-                _alarmOn.value = false
-            }
-            false -> {
-                Timber.tag(TAG).d("startTimer with timeSelection ${timeSelection.value}")
-                // switch to on if off
-                timeSelection.value?.let { startTimer(it) }
-            }
-        }
-    }
-
-    /**
-     * Sets the desired interval for the alarm
-     *
-     * @param timerLengthSelection, interval timerLengthSelection value.
-     */
-    fun setTimeSelected(timerLengthSelection: Int) {
-        Timber.tag(TAG).d("setTimeSelected got timerLengthSelection $timerLengthSelection")
-        _timeSelection.value = timerLengthSelection
-    }
-
-    /**
-     * Creates a new alarm, notification and timer
-     */
-    private fun startTimer(timerLengthSelection: Int) {
-        Timber.tag(TAG).d("startTimer...alarmOn.value is ${_alarmOn.value}")
-        _alarmOn.value?.let {
-            if (!it) {
-                // block runs when _alarmOn is false (can't start if already started)
-                // now set alarmOn
-
-                _alarmOn.value = true
-//                _selectedInterval.value = timerLengthOptions[timerLengthSelection] * minute
-                _selectedInterval.value = timerLengthSelection * minute
-                //_selectedInterval.value = 10 * second
-                Timber.tag(TAG).d("startTimer: We set selectedInterval ${_selectedInterval.value}")
-
-                val triggerTime = SystemClock.elapsedRealtime() + _selectedInterval.value!!
-
-                Timber.tag(TAG).d("set Alarm with triggerTime $triggerTime")
-                AlarmManagerCompat.setExactAndAllowWhileIdle(
-                    alarmManager,
-                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    triggerTime,
-                    notifyPendingIntent
-                )
-
-                viewModelScope.launch {
-                    // if we navigate away and then back saving these let us resume
-                    saveTime(triggerTime)
-                    _selectedInterval.value?.let { it1 -> savedSelectedInterval(it1) }
-                }
-            }
-        }
         createTimer()
     }
 
@@ -187,24 +215,24 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun createTimer() {
         viewModelScope.launch {
-            val triggerTime = loadTime()
-            val selectedIntervalValue = loadSelectedInterval().toFloat()
-            Timber.tag(TAG).d("createTimer loaded time $triggerTime")
-            timer = object : CountDownTimer(triggerTime, second) {
-                override fun onTick(millisUntilFinished: Long) {
-                    _elapsedTime.value = triggerTime - SystemClock.elapsedRealtime()
-                    val elapsedTimeValue = _elapsedTime.value?.toFloat()
-                    if(selectedIntervalValue != null && selectedIntervalValue!= 0.0f && elapsedTimeValue != null) {
-                        _fractionRemaining.value = elapsedTimeValue/selectedIntervalValue
-                    }
+            val triggerTime = loadTriggerTime()
+            val timeSelectionValue = loadTimeSelection().toFloat()
+            timeSelection.value = timeSelectionValue.toInt()
 
-                    if (_elapsedTime.value!! <= 0) {
-                        resetTimer()
+            Timber.tag(TAG).d("createTimer loaded time $triggerTime and timeSelection $timeSelectionValue")
+            timer = object : CountDownTimer(triggerTime, SECOND) {
+                override fun onTick(millisUntilFinished: Long) {
+                    _remainingTimeMilliseconds.value = triggerTime - SystemClock.elapsedRealtime()
+                    // If it's over already then resetTimer
+                    if (_remainingTimeMilliseconds.value!! <= 0) {
+                        Timber.tag(TAG).d("no remaining milliseconds (${_remainingTimeMilliseconds.value}): turn alarm off")
+                        onFinishedTimer()
                     }
                 }
 
                 override fun onFinish() {
-                    resetTimer()
+                    Timber.tag(TAG).d("timer finished: turn alarm off")
+                    onFinishedTimer()
                 }
             }
             timer.start()
@@ -212,25 +240,9 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Cancels the alarm, notification and resets the timer
+     * Functions to do w/ save/load of state (e.g. so we can continue upon nav away
+     * or minimize app)
      */
-    private fun cancelNotification() {
-        resetTimer()
-        alarmManager.cancel(notifyPendingIntent)
-    }
-
-    /**
-     * Resets the timer on screen and sets alarm value false
-     */
-    private fun resetTimer() {
-        timer.cancel()
-        _elapsedTime.value = 0
-        _alarmOn.value = false
-        _fractionRemaining.value = 0.0f
-        Timber.tag(TAG).d("resetTimer called. Timer cancelled, _elapsedTime set to 0, _alarmOn false, _fractionRemaining 0")
-
-    }
-
     private suspend fun saveTime(triggerTime: Long) =
         withContext(Dispatchers.IO) {
             Timber.tag(TAG).d("saveTime w/ triggerTime $triggerTime")
@@ -238,22 +250,22 @@ class MeditationTimerViewModel(app: Application) : AndroidViewModel(app) {
 
         }
 
-    private suspend fun savedSelectedInterval(selectedInterval: Long) =
+    private suspend fun savedTimeSelection(timeSelection: Int) =
         withContext(Dispatchers.IO) {
-            Timber.tag(TAG).d("savedSelectedInterval w/ selectedInterval $selectedInterval")
-            prefs.edit().putLong(selectedIntervalKey, selectedInterval).apply()
+            Timber.tag(TAG).d("savedTimeSelection w/ timeSelection $timeSelection")
+            prefs.edit().putInt(timeSelectionKey, timeSelection).apply()
 
         }
 
-    private suspend fun loadTime(): Long =
+    private suspend fun loadTriggerTime(): Long =
         withContext(Dispatchers.IO) {
-            Timber.tag(TAG).d("loadTime")
+            Timber.tag(TAG).d("loadTriggerTime")
             prefs.getLong(triggerAtTime, 0)
         }
 
-    private suspend fun loadSelectedInterval(): Long =
+    private suspend fun loadTimeSelection(): Int =
         withContext(Dispatchers.IO) {
-            Timber.tag(TAG).d("loadSelectedInterval")
-            prefs.getLong(selectedIntervalKey, 0)
+            Timber.tag(TAG).d("loadTimeSelection")
+            prefs.getInt(timeSelectionKey, 1)
         }
 }

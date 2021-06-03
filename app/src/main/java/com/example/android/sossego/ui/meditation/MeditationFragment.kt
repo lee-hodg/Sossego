@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.sossego.R
 import com.example.android.sossego.databinding.FragmentMediationTimerBinding
@@ -33,7 +34,13 @@ class MeditationFragment : Fragment() {
         binding.numberPicker.minValue = 1
         binding.numberPicker.maxValue = 20
         binding.numberPicker.displayedValues = numbers
-        binding.numberPicker.value = 1
+        // binding.numberPicker.value = 1
+
+//
+//        viewModel.isAlarmOn.observe(viewLifecycleOwner, { isOn ->
+//            viewModel.handleAlarmOnOff(isOn)
+//        })
+
         return binding.root
     }
 }
