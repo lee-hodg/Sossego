@@ -54,6 +54,8 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
     private lateinit var gratitudeListListener: ValueEventListener
 
+    private lateinit var streakCountListener: ValueEventListener
+
     private fun createChannel(channelId: String, channelName: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(
@@ -87,6 +89,7 @@ class GratitudeFragment : Fragment(), KoinComponent {
             gratitudeRepository.removeGratitudeListValueEventListener(
                 it,
                 gratitudeListListener)
+            userRepository.removeStreakCountListener(streakCountListener, it)
         }
     }
 
@@ -192,7 +195,7 @@ class GratitudeFragment : Fragment(), KoinComponent {
         }
 
         // Set the streak count
-        val streakCountListener = object : ValueEventListener {
+        streakCountListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val userInstance = dataSnapshot.getValue<User>()
                 gratitudeViewModel.streakCount.value = userInstance?.streakCount ?: 1
