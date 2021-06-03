@@ -13,7 +13,7 @@ class GratitudeViewModel(
 ) : AndroidViewModel(application) {
 
     // How many consecutive logins
-    var streakCount: Int = 1
+    var streakCount = MutableLiveData(1)
 
     /**
               Navigation from list to detail

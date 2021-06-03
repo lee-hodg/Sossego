@@ -20,6 +20,8 @@ import com.example.android.sossego.R
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.quotes.database.QuoteDatabase
+import com.example.android.sossego.database.user.repository.User
+import com.example.android.sossego.database.user.repository.UserRepository
 import com.example.android.sossego.databinding.FragmentGratitudeBinding
 import com.example.android.sossego.ui.gratitude.detail.SwipeToDeleteCallback
 import com.example.android.sossego.ui.login.LoginViewModel
@@ -28,10 +30,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import timber.log.Timber
-import java.util.*
 
 /**
  * This is responsible for the listing of gratitude lists which will be displayed
@@ -47,6 +47,8 @@ class GratitudeFragment : Fragment(), KoinComponent {
     private val loginViewModel: LoginViewModel by inject()
 
     private val gratitudeRepository: GratitudeRepository by inject()
+
+    private val userRepository: UserRepository by inject()
 
     private lateinit var gratitudeViewModel: GratitudeViewModel
 
@@ -189,6 +191,19 @@ class GratitudeFragment : Fragment(), KoinComponent {
             }
         }
 
+        // Set the streak count
+        val streakCountListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val userInstance = dataSnapshot.getValue<User>()
+                gratitudeViewModel.streakCount.value = userInstance?.streakCount ?: 1
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+                Timber.d("onCancelled called")
+            }
+        }
+
+
         // Observe the authentication state so we can know if the user has logged in successfully.
         // After log-in/log-out we add/remove the event listener with the userId
         // and we also record the userId on the gratitudeViewModel (or set it to null)
@@ -200,12 +215,14 @@ class GratitudeFragment : Fragment(), KoinComponent {
                         gratitudeRepository.removeGratitudeListValueEventListener(
                             it,
                             gratitudeListListener)
+                        userRepository.removeStreakCountListener(streakCountListener, it)
                     }
                 }
                 else -> {
                     // Hook up the listener for this auth user id
                     gratitudeRepository.addGratitudeListValueEventListener(authUserId,
                         gratitudeListListener)
+                    userRepository.addStreakCountListener(streakCountListener, authUserId)
                 }
             }
             // Either way make sure our view model records the latest user id (or null)
@@ -236,12 +253,6 @@ class GratitudeFragment : Fragment(), KoinComponent {
             this, quoteViewModelFactory).get(QuotesViewModel::class.java)
 
         binding.quoteViewModel = quoteViewModel
-
-        // Set the streak count
-
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val counterAppOpenedPrefKey = requireContext().getString(R.string.app_opened_counter_preference_key)
-        gratitudeViewModel.streakCount = sharedPreferences.getInt(counterAppOpenedPrefKey, 1)
 
         return binding.root
     }

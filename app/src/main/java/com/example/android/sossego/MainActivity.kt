@@ -63,31 +63,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val requestCode = 0
 
     private fun trackAppOpens(){
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
-            applicationContext)
-
-        val lastDayAppOpenedPrefKey = applicationContext.getString(R.string.last_day_opened_preference_key)
-        val counterAppOpenedPrefKey = applicationContext.getString(R.string.app_opened_counter_preference_key)
-
-        // Get the current day of the year
-        val c: Calendar = Calendar.getInstance()
-        val thisDay: Int = c.get(Calendar.DAY_OF_YEAR)
-
-        // Get the last login day (default 0) and current consecutive opens count (default 0)
-        val lastDay = sharedPreferences.getInt(lastDayAppOpenedPrefKey, 0)
-        var counterOfConsecutiveDays = sharedPreferences.getInt(counterAppOpenedPrefKey, 0)
-
-        if (lastDay == thisDay - 1) {
-            // If we have consecutive day opens then increase the count
-            counterOfConsecutiveDays += 1
-        } else {
-            // Else we must reset to 1
-            counterOfConsecutiveDays = 1
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+        Timber.tag(TAG).d("Running trackAppOpens on $currentUserUid")
+        if(currentUserUid != null){
+            userRepository.incrementUserStreakCount(currentUserUid)
         }
-        sharedPreferences.edit().putInt(lastDayAppOpenedPrefKey, thisDay).apply()
-        sharedPreferences.edit().putInt(counterAppOpenedPrefKey, counterOfConsecutiveDays).apply()
-
-        Timber.tag(TAG).d("Set the streak count to $counterOfConsecutiveDays")
     }
 
     private fun initKoin() {
@@ -229,8 +209,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         // Setup the alarm notifications
         setupRepeatingAlarm()
 
-        // Try to track app opens so we can display streaks
-        trackAppOpens()
+
 
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
@@ -259,6 +238,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 LoginViewModel.AuthenticationState.AUTHENTICATED -> {
                     Timber.tag(GratitudeFragment.TAG).d("Logged in success")
                     invalidateOptionsMenu()
+
+                    // Try to track app opens so we can display streaks
+                    trackAppOpens()
                 }
                 else -> {
                     Timber.tag(GratitudeFragment.TAG).e("Not authenticated down. Re-draw menu")

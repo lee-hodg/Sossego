@@ -8,7 +8,9 @@ data class User(
     val uid: String = "",
     val createdDate: Long = System.currentTimeMillis(),
     var displayName: String? = "",
-    var email: String? = ""
+    var email: String? = "",
+    var streakCount: Int = 1,
+    var lastAppOpenDayOfYear: Int? = null
 )
 
 /**

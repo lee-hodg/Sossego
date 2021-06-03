@@ -7,8 +7,10 @@ import com.example.android.sossego.database.user.repository.User
 import com.example.android.sossego.database.user.repository.UserLogin
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import timber.log.Timber
+import java.util.*
 
 
 class AppDatabase private constructor() {
@@ -141,6 +143,48 @@ class AppDatabase private constructor() {
         val userLoginKey = userLoginNode.push().key
         val firebaseUserLogin = UserLogin(uid=userId)
         userLoginNode.child(userLoginKey!!).setValue(firebaseUserLogin)
+    }
+
+
+    fun incrementUserStreakCount(userId: String) {
+        synchronized(this) {
+            // Get the current day of the year
+            Timber.tag(TAG).d("Running incrementUserStreakCount w/ userId $userId")
+
+            userNode.child(userId).child("lastAppOpenDayOfYear").get().addOnSuccessListener {
+                val thisDay: Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
+                if (it.exists() && it.value == (thisDay - 1L)) {
+                    Timber.tag(TAG)
+                        .d("thisDay is $thisDay whereas the lastAppOpenDayOfYear has value ${it.value}. Do ++")
+                    // If we have consecutive day opens then increase the count
+                    userNode.child(userId).child("streakCount").setValue(ServerValue.increment(1))
+                    userNode.child(userId).child("lastAppOpenDayOfYear").setValue(thisDay)
+                } else if(!it.exists() || (it.exists() && it.value != thisDay.toLong())) {
+                    Timber.tag(TAG)
+                        .d("thisDay is $thisDay whereas the lastAppOpenDayOfYear has value ${it.value}. Reset streak")
+                    // Else we must reset to 1 and set lastAppOpenDayOfYear
+                    userNode.child(userId).child("streakCount").setValue(1)
+                    userNode.child(userId).child("lastAppOpenDayOfYear").setValue(thisDay)
+
+                }
+            }.addOnFailureListener {
+                Timber.tag(TAG).e("incrementUserStreakCount fail fetching with userId $userId")
+            }
+        }
+
+    }
+
+    fun addStreakCountListener(valueEventListener: ValueEventListener, userId: String?) {
+        Timber.tag(TAG).d("Add streak count value event listener for userId $userId")
+        if(userId != null) {
+            userNode.child(userId).addValueEventListener(valueEventListener)
+        }
+    }
+    fun removeStreakCountListener(valueEventListener: ValueEventListener, userId: String?) {
+        Timber.tag(TAG).d("Remove streak count value event listener for userId $userId")
+        if(userId != null) {
+            userNode.child(userId).removeEventListener(valueEventListener)
+        }
     }
 
     /**
