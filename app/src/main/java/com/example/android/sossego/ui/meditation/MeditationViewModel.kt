@@ -132,6 +132,7 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
         Timber.tag(TAG).d("cancel timer")
         timer.cancel()
         _remainingTimeMilliseconds.value = 0
+        _alarmOn.value = false
     }
 
     private fun onAlarmOff(){
@@ -152,7 +153,6 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
         }
 
         Timber.tag(TAG).d("Set alarmOn to false")
-        _alarmOn.value = false
 
         onFinishedTimer()
     }
