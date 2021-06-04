@@ -79,6 +79,7 @@
             android:layout_marginEnd="@dimen/margin2x"
             android:layout_marginBottom="@dimen/margin2x"
             android:clickable="false"
+            app:backgroundTint="@color/water_blue"
             android:contentDescription="@string/add_gratitude_list_fab_content"
             android:onClick="@{() -> gratitudeViewModel.addNewGratitudeList()}"
             app:layout_constraintBottom_toBottomOf="parent"

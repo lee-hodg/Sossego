@@ -7,6 +7,8 @@ import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.core.content.res.ResourcesCompat
+import com.example.android.sossego.R
 import timber.log.Timber
 
 
@@ -35,6 +37,9 @@ class TimerClockView @JvmOverloads constructor(
             invalidate()
         }
 
+    private val waterColor = ResourcesCompat.getColor(resources, R.color.water_blue,
+        context.theme)
+
     private val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         color = Color.WHITE
@@ -45,7 +50,7 @@ class TimerClockView @JvmOverloads constructor(
 
     private val donutPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = Color.BLUE
+        color = waterColor
         textAlign = Paint.Align.CENTER
         textSize = 55.0f
         typeface = Typeface.create( "", Typeface.BOLD)

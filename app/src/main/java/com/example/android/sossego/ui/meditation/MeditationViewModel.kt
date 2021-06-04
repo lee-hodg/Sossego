@@ -67,16 +67,18 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
     private var bellSound: Int
 
 
-    private fun playSound() {
-        soundPool.play(
-            bellSound, 1F, 1F, 0, 0, 1F
-        )
+    private suspend fun playSound() {
+        withContext(Dispatchers.IO) {
+            soundPool.play(
+                bellSound, 1F, 1F, 0, 0, 1F
+            )
 
 //        if (mMediaPlayer == null) {
 //            mMediaPlayer = MediaPlayer.create(app.applicationContext, R.raw.bell)
 //            mMediaPlayer!!.isLooping = false
 //            mMediaPlayer!!.start()
 //        } else mMediaPlayer!!.start()
+        }
     }
 
     /**
@@ -216,7 +218,9 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
                         Timber.tag(TAG).d("Computed modVal $modVal from $remainingTimeVal")
                         if(modVal == 0.0f) {
                             Timber.tag(TAG).d("Hit that cymbal")
-                            playSound()
+                            viewModelScope.launch {
+                                playSound()
+                            }
                         }
                     }
 

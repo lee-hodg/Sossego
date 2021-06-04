@@ -39,6 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin2x"
+            app:backgroundTint="@color/water_blue"
             android:layout_marginBottom="@dimen/margin2x"
             android:clickable="false"
             android:contentDescription="@string/add_journal_entry_fab_content_description"
