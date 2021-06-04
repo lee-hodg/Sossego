@@ -140,15 +140,16 @@ class JournalListingFragment : Fragment() {
 
                 val journalEntries : MutableList<FirebaseJournalEntry> = mutableListOf()
                 // Ensure the lists are reverse createdDate ordered
-                val sortedJournalEntries = dataSnapshot.children.sortedByDescending { "createdDate" }
+                val entriesFromSnapshot = dataSnapshot.children
 
-                for(journalEntry in sortedJournalEntries) {
+                for(journalEntry in entriesFromSnapshot) {
                     val item = journalEntry.getValue<FirebaseJournalEntry>()
                     Timber.tag(TAG).d("journalEntriesListener adding item ${item?.journalEntryId}")
                     journalEntries.add(item!!)
                 }
 
-                journalEntryListAdapter.submitJournalEntryList(journalEntries)
+                val sortedEntries = journalEntries.sortedByDescending { it.createdDate }
+                journalEntryListAdapter.submitJournalEntryList(sortedEntries)
 
             }
 

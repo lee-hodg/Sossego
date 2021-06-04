@@ -13,7 +13,6 @@ import androidx.databinding.DataBindingUtil
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
@@ -179,14 +178,16 @@ class GratitudeFragment : Fragment(), KoinComponent {
                 val listOfGratitudeLists : MutableList<FirebaseGratitudeList> = mutableListOf()
 
                 // Ensure the lists are reverse createdDate ordered
-                val sortedGratitudeLists = dataSnapshot.children.sortedByDescending { "createdDate" }
+                val snapshotGratitudeLists = dataSnapshot.children.sortedByDescending { "createdDate" }
 
-                for(gratitudeList in sortedGratitudeLists) {
+                for(gratitudeList in snapshotGratitudeLists) {
                     val item = gratitudeList.getValue<FirebaseGratitudeList>()
                     listOfGratitudeLists.add(item!!)
                 }
 
-                gratitudeListAdapter.submitGratitudeList(listOfGratitudeLists)
+                val sortedGratitudeList = listOfGratitudeLists.sortedByDescending { it.createdDate }
+
+                gratitudeListAdapter.submitGratitudeList(sortedGratitudeList)
 
             }
 

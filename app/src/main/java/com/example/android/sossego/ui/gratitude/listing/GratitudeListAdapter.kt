@@ -26,7 +26,7 @@ class GratitudeListAdapter(private val clickListener: GratitudeListListener) : L
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
-    fun submitGratitudeList(list: MutableList<FirebaseGratitudeList>?) {
+    fun submitGratitudeList(list: List<FirebaseGratitudeList>?) {
         adapterScope.launch {
 
             val listItems : MutableList<DataItem> = ArrayList()
