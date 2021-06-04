@@ -83,11 +83,11 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
 
     override fun onDestroy() {
-        Timber.tag(TAG).d("onDestory called for GratitudeFragment")
+        Timber.tag(TAG).d("onDestroy called for GratitudeFragment")
         super.onDestroy()
         // Unhook the listener
         gratitudeViewModel.authenticatedUserId.value?.let {
-            Timber.tag(TAG).d("Unhook the firebase event value listeners")
+            Timber.tag(TAG).d("Unhook the firebase event value listeners for $it")
             gratitudeRepository.removeGratitudeListValueEventListener(
                 it, gratitudeListListener)
             userRepository.removeStreakCountListener(streakCountListener, it)

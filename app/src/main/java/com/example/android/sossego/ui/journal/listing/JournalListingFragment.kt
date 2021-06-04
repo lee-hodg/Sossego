@@ -46,9 +46,11 @@ class JournalListingFragment : Fragment() {
 
 
     override fun onDestroy() {
+        Timber.tag(TAG).d("onDestroy called in JournalFragment")
         super.onDestroy()
         // Unhook the listener
         journalListingViewModel.authenticatedUserId.value?.let {
+            Timber.tag(TAG).d("remove journal entry list value listener for $it")
             journalRepository.removeJournalEntryListValueEventListener(
                 it,
                 journalEntriesListener)
@@ -142,6 +144,7 @@ class JournalListingFragment : Fragment() {
 
                 for(journalEntry in sortedJournalEntries) {
                     val item = journalEntry.getValue<FirebaseJournalEntry>()
+                    Timber.tag(TAG).d("journalEntriesListener adding item ${item?.journalEntryId}")
                     journalEntries.add(item!!)
                 }
 
@@ -150,7 +153,7 @@ class JournalListingFragment : Fragment() {
             }
 
             override fun onCancelled(p0: DatabaseError) {
-                Timber.d("onCancelled called")
+                Timber.d("onCancelled called for journal entries listener. Error $p0")
             }
         }
         // Observe the authentication state so we can know if the user has logged in successfully.
@@ -168,6 +171,7 @@ class JournalListingFragment : Fragment() {
                 }
                 else -> {
                     // Hookup the listener for this auth user's entries
+                    Timber.tag(TAG).d("add journal entry list value listener for $authUserId")
                     journalRepository.addJournalEntryListValueEventListener(authUserId, journalEntriesListener)
                 }
             }
