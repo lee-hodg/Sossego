@@ -1,31 +1,26 @@
 package com.example.android.sossego.ui.meditation
 
-import android.app.AlarmManager
 import android.app.Application
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.media.MediaPlayer
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.SoundPool
+import android.os.Build
 import android.os.CountDownTimer
 import android.os.SystemClock
-import androidx.core.app.AlarmManagerCompat
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
-import com.example.android.sossego.R
-import com.example.android.sossego.receiver.MeditationAlarmReceiver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.math.floor
-
+import com.example.android.sossego.R
 
 private const val MINUTE: Long = 60_000L
 private const val SECOND: Long = 1_000L
-private const val requestCode = 1101
 private const val triggerAtTime = "TRIGGER_AT"
 private const val timeSelectionKey = "SELECTED_TIME"
-
+private const val alarmStateKey = "ALARM_STATE"
 
 class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
 
@@ -33,22 +28,16 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
         private const val TAG = "MediationViewModel"
     }
 
-    private var notifyPendingIntent: PendingIntent? = null
-
-    private val alarmManager = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     private val prefs = PreferenceManager.getDefaultSharedPreferences(app.applicationContext)
 
-    private val notifyIntent = Intent(app, MeditationAlarmReceiver::class.java)
     private lateinit var timer: CountDownTimer
-
 
     /*
      *      Variables to do with alarm and countdown timer
      */
     // Is the alarm set to on/off
-    private var existingAlarm: Boolean = false
-    private var _alarmOn = MutableLiveData<Boolean>()
+    private var _alarmOn = MutableLiveData(false)
     val isAlarmOn: LiveData<Boolean>
         get() = _alarmOn
 
@@ -59,29 +48,36 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
 
     val timeSelection = MutableLiveData(1)
 
-//    // How many minutes did the user select
-//    val timeSelection: MutableLiveData<Int>
-//        get() = _timeSelection
-
     // The interval in milliseconds (a simple transformation of the minutes count selected)
     private val intervalMilliseconds = Transformations.map(timeSelection) { it * MINUTE }
-
 
     private val _fractionRemaining = MediatorLiveData<Float>()
     val fractionRemaining: LiveData<Float>
         get() = _fractionRemaining
 
+    /**
+     * Play the meditation interval sounds
+     */
+//    private var mMediaPlayer: MediaPlayer? = null
 
-    private var mMediaPlayer: MediaPlayer? = null
+    private lateinit var audioAttributes: AudioAttributes
+
+    private var soundPool: SoundPool
+
+    private var bellSound: Int
+
 
     private fun playSound() {
-        if (mMediaPlayer == null) {
-            mMediaPlayer = MediaPlayer.create(app.applicationContext, R.raw.tibetan_bell)
-            mMediaPlayer!!.isLooping = false
-            mMediaPlayer!!.start()
-        } else mMediaPlayer!!.start()
-    }
+        soundPool.play(
+            bellSound, 1F, 1F, 0, 0, 1F
+        )
 
+//        if (mMediaPlayer == null) {
+//            mMediaPlayer = MediaPlayer.create(app.applicationContext, R.raw.bell)
+//            mMediaPlayer!!.isLooping = false
+//            mMediaPlayer!!.start()
+//        } else mMediaPlayer!!.start()
+    }
 
     /**
      * This method is responsible for dynamically computing the fraction remaining
@@ -104,71 +100,49 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
 
     init {
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            soundPool = SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                .setMaxStreams(2)
+                .build()
+        } else {
+            soundPool = SoundPool(
+                3,
+                AudioManager.STREAM_MUSIC,
+                0)
+        }
+
+        bellSound = soundPool.load(
+            app.applicationContext,
+            R.raw.bell,
+            1
+        )
+
         // Add the sources for the fraction remaining mediator live data
         _fractionRemaining.addSource(intervalMilliseconds) { computeFractionRemaining() }
         _fractionRemaining.addSource(_remainingTimeMilliseconds) { computeFractionRemaining() }
-
-        // Determine if alarm state is on/off based on if there is a pending intent
-        // This doesn't create a PendingIntent (FLAG_NO_CREATE), it just checks if one exists
-        // If one does not, getBroadcast returns null, and _alarmOn.value set to false
-        // else if one does exist _alarmOn.value set to true
-        // Let's say we navigate away and come back. The existence of the pending intent
-        // tells us the alarm is on, then we can reload triggerTime and interval selected
-        // to do setup again and act accordingly
-        existingAlarm = PendingIntent.getBroadcast(
-            app,
-            requestCode,
-            notifyIntent,
-            PendingIntent.FLAG_NO_CREATE
-        ) != null
-
-        _alarmOn.value = existingAlarm
-
-        if (existingAlarm) {
-            // We don't create another PendingIntent/setAlarm/saveTimes because
-            // they already exist, but we do call createTimer, which will
-            // load any saved params and start the countdown which
-            // continues the UI
-            createTimer()
-        } else {
-            // So that when user returns we get same as before
-            viewModelScope.launch {
-                timeSelection.value= loadTimeSelection()
-            }
+        viewModelScope.launch {
+            createOrResumeTimer()
         }
-
-        Timber.tag(TAG).d("init: we determined that existingAlarm $existingAlarm")
 
     }
 
     private fun onFinishedTimer(){
         // Alarm is off so make sure we cancel the pendingIntent
-        Timber.tag(TAG).d("cancel timer")
+        Timber.tag(TAG).d("onFinishedTimer: cancel timer")
         timer.cancel()
         _remainingTimeMilliseconds.value = 0
         _alarmOn.value = false
-    }
 
-    private fun onAlarmOff(){
-        // Get the PI and kill it if exists (use FLAG NO CREATE so we do not create if no there)
-        val killPendingIntent = PendingIntent.getBroadcast(
-            app,
-            requestCode,
-            notifyIntent,
-            PendingIntent.FLAG_NO_CREATE
-        )
-
-        if(killPendingIntent != null) {
-            Timber.tag(TAG).d("Killing pending intent")
-            killPendingIntent.cancel()
-            alarmManager.cancel(killPendingIntent)
-        }else{
-            Timber.tag(TAG).d("No pending intent found to kill")
+        viewModelScope.launch {
+            // if we navigate away and then back saving these let us resume
+            saveTriggerTime(-1L)
+            saveAlarmState(false)
         }
-
-        Timber.tag(TAG).d("Set alarmOn to false")
-
-        onFinishedTimer()
     }
 
     /*
@@ -178,48 +152,35 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
         Timber.tag(TAG).d("toggleAlarm called: w/ _alarmOn.value ${_alarmOn.value}")
         when(_alarmOn.value) {
             true-> {
-                onAlarmOff()
+                onFinishedTimer()
             }
             else-> {
-                // Alarm was off
-                setAlarmAndStartTimer()
+                // Alarm was off now set it to on
+                _alarmOn.value = true
+                val triggerTime = computeTriggerTime()
+                // Save alarm state, trigger time and selected time interval
+                // so be can resume timer when minimized or nav away and back etc
+                viewModelScope.launch {
+                    // if we navigate away and then back saving these let us resume
+                    saveAlarmState(true)
+                    saveTriggerTime(triggerTime)
+                    timeSelection.value?.let { it -> savedTimeSelection(it) }
+
+                    createOrResumeTimer()
+
+                }
+
             }}
     }
 
     /**
-     * Creates a new alarm, notification and timer
+     * Use the intervalMilliseconds to compute the computeTriggerTime for the counter
      */
-    private fun setAlarmAndStartTimer() {
-        Timber.tag(TAG).d("startTimer..")
-
-        _alarmOn.value = true
-
-        notifyPendingIntent = PendingIntent.getBroadcast(
-            app,
-            requestCode,
-            notifyIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
+    private fun computeTriggerTime(): Long {
         val triggerTime = SystemClock.elapsedRealtime() + intervalMilliseconds.value!!
-        Timber.tag(TAG).d("startTimer: We have _intervalMilliseconds ${intervalMilliseconds.value} and timeSelection ${timeSelection.value}")
-        Timber.tag(TAG).d("set Alarm with triggerTime $triggerTime")
-
-        AlarmManagerCompat.setExactAndAllowWhileIdle(
-            alarmManager,
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            triggerTime,
-            notifyPendingIntent!!
-        )
-
-
-        viewModelScope.launch {
-            // if we navigate away and then back saving these let us resume
-            saveTime(triggerTime)
-            timeSelection.value?.let { it -> savedTimeSelection(it) }
-        }
-
-        createTimer()
+        Timber.tag(TAG).d("computeTriggerTime: We have _intervalMilliseconds ${intervalMilliseconds.value} and timeSelection ${timeSelection.value}")
+        Timber.tag(TAG).d("computeTriggerTime: computed triggerTime $triggerTime")
+        return triggerTime
     }
 
     /**
@@ -227,16 +188,27 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
      * This is the bit that updates the elapsed time counter we will display in the
      * UI as a countdown
      */
-    private fun createTimer() {
-        viewModelScope.launch {
+    private suspend fun createOrResumeTimer() {
+
+            val alarmState = loadAlarmState()
+            _alarmOn.value = alarmState
+
             val triggerTime = loadTriggerTime()
             val timeSelectionValue = loadTimeSelection().toFloat()
             timeSelection.value = timeSelectionValue.toInt()
+
+            // Check if something to resume
+            if(triggerTime == -1L || !alarmState ){
+                Timber.tag(TAG).d("Got -1L triggerTime or false alarmState. No timer to resume. Return")
+                return
+            }
 
             Timber.tag(TAG).d("createTimer loaded time $triggerTime and timeSelection $timeSelectionValue")
             timer = object : CountDownTimer(triggerTime, SECOND) {
                 override fun onTick(millisUntilFinished: Long) {
                     _remainingTimeMilliseconds.value = triggerTime - SystemClock.elapsedRealtime()
+
+                    // Play a sound at each minute
                     val remainingTimeVal = _remainingTimeMilliseconds.value
                     if(remainingTimeVal != null) {
                         val modVal = floor((remainingTimeVal.toFloat() / 1000.0f) % 60.0f)
@@ -261,16 +233,16 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
                 }
             }
             timer.start()
-        }
+
     }
 
     /**
      * Functions to do w/ save/load of state (e.g. so we can continue upon nav away
      * or minimize app)
      */
-    private suspend fun saveTime(triggerTime: Long) =
+    private suspend fun saveTriggerTime(triggerTime: Long) =
         withContext(Dispatchers.IO) {
-            Timber.tag(TAG).d("saveTime w/ triggerTime $triggerTime")
+            Timber.tag(TAG).d("saveTriggerTime w/ triggerTime $triggerTime")
             prefs.edit().putLong(triggerAtTime, triggerTime).apply()
 
         }
@@ -282,15 +254,30 @@ class MeditationTimerViewModel(val app: Application) : AndroidViewModel(app) {
 
         }
 
+
     private suspend fun loadTriggerTime(): Long =
         withContext(Dispatchers.IO) {
             Timber.tag(TAG).d("loadTriggerTime")
-            prefs.getLong(triggerAtTime, 0)
+            prefs.getLong(triggerAtTime, -1L)
         }
 
     private suspend fun loadTimeSelection(): Int =
         withContext(Dispatchers.IO) {
             Timber.tag(TAG).d("loadTimeSelection")
             prefs.getInt(timeSelectionKey, 1)
+        }
+
+
+    private suspend fun saveAlarmState(alarmState: Boolean) =
+        withContext(Dispatchers.IO) {
+            Timber.tag(TAG).d("saveAlarmState w/ alarmState $alarmState")
+            prefs.edit().putBoolean(alarmStateKey, alarmState).apply()
+
+        }
+
+    private suspend fun loadAlarmState(): Boolean =
+        withContext(Dispatchers.IO) {
+            Timber.tag(TAG).d("loadAlarmState")
+            prefs.getBoolean(alarmStateKey, false)
         }
 }
