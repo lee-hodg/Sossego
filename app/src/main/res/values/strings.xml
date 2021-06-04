@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Sossego</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -44,4 +43,6 @@
     <string name="water_waves_background_image">Water waves background image</string>
     <string name="play_or_pause_the_timer">play or pause the timer</string>
     <string name="water_droplet">Water droplet</string>
+    <string name="app_name">Sossego</string>
+    <string name="app_splashscreen_logo">App Splashscreen Logo</string>
 </resources>
