@@ -83,12 +83,13 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
 
     override fun onDestroy() {
+        Timber.tag(TAG).d("onDestory called for GratitudeFragment")
         super.onDestroy()
         // Unhook the listener
         gratitudeViewModel.authenticatedUserId.value?.let {
+            Timber.tag(TAG).d("Unhook the firebase event value listeners")
             gratitudeRepository.removeGratitudeListValueEventListener(
-                it,
-                gratitudeListListener)
+                it, gratitudeListListener)
             userRepository.removeStreakCountListener(streakCountListener, it)
         }
     }
@@ -190,7 +191,7 @@ class GratitudeFragment : Fragment(), KoinComponent {
             }
 
             override fun onCancelled(p0: DatabaseError) {
-                Timber.d("onCancelled called")
+                Timber.d("onCancelled called for gratitudeListListener. Error: $p0")
             }
         }
 
@@ -202,7 +203,7 @@ class GratitudeFragment : Fragment(), KoinComponent {
             }
 
             override fun onCancelled(p0: DatabaseError) {
-                Timber.d("onCancelled called")
+                Timber.d("onCancelled called for streakCountListener. Error: $p0")
             }
         }
 
