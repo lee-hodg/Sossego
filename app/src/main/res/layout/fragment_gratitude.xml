@@ -17,9 +17,11 @@
     </data>
 
     <!-- Start of the visible fragment layout using ConstraintLayout -->
-    <androidx.constraintlayout.widget.ConstraintLayout  android:layout_width="match_parent"
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.gratitude.listing.GratitudeFragment">
+    tools:context=".ui.gratitude.listing.GratitudeFragment"
+        app:layoutDescription="@xml/fragment_gratitude_scene">
 
         <TextView
             android:id="@+id/greeting_tv"
@@ -97,5 +99,5 @@
             app:layout_constraintTop_toBottomOf="@+id/quote_of_the_day_text" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>
