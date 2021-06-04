@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/navigation_gratitude"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@drawable/ic_pray"
         android:title="@string/title_gratitude" />
 
     <item
         android:id="@+id/navigation_journal"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@android:drawable/ic_menu_edit"
         android:title="@string/title_journal" />
 
     <item
