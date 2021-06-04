@@ -1,7 +1,16 @@
 # Sossego
 
 ![Made with love in Brazil](https://madewithlove.now.sh/br?heart=true&template=for-the-badge)
-[![Python](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
+
+## Screenshots
+
+
+Sossego is a free, open-source Android app writen in Kotlin
+
+Sossego features gratitude lists, journaling, configurable reminders and an adjustable meditation timer.
+The hope is that Sossego will be useful for people wishing to generate more peace and mindfulness in their lives and help addicts
+in recovery completing programs that involve such practices.
+
 
 ## Firebase rules
 
