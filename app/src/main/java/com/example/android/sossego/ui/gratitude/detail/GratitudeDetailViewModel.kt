@@ -90,7 +90,7 @@ class GratitudeDetailViewModel (
         }
 
         // hide soft keyboard
-        _hideSoftKeyboard.value = true
+        //_hideSoftKeyboard.value = true
         // clear
         newGratitudeItemText.value = null
     }

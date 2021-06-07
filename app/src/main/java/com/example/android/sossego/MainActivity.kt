@@ -253,6 +253,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     override fun onSupportNavigateUp(): Boolean{
+        hideKeyboard()
         val navController = this.findNavController(R.id.nav_host_fragment)
         return navController.navigateUp()
     }

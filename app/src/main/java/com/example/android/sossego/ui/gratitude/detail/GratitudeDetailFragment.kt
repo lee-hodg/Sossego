@@ -85,6 +85,9 @@ class GratitudeDetailFragment : Fragment(), KoinComponent {
                 // Reset state to make sure we only navigate once, even if the device
                 // has a configuration change.
                 gratitudeDetailViewModel.doneNavigating()
+
+                hideKeyboard()
+                gratitudeDetailViewModel.softKeyboardHidden()
             }
         })
 
