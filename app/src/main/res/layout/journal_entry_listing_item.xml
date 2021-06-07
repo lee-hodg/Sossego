@@ -14,49 +14,45 @@
             name="clickListener"
             type="com.example.android.sossego.ui.journal.listing.JournalEntryListener" />
     </data>
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardViewStyle">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:onClick="@{() -> clickListener.onClick(journalEntry)}">
-
-        <ImageView
-            android:id="@+id/writing_image"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="60dp"
-            android:background="@color/white"
-            android:contentDescription="@string/journal_list_image"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_edit"
-            tools:srcCompat="@android:drawable/ic_menu_edit" />
-
-        <TextView
-            android:id="@+id/list_creation_date"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin"
-            android:layout_marginEnd="@dimen/margin"
-            android:textStyle="bold"
-            app:journalEntryCreatedDate="@{journalEntry}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/writing_image"
-            app:layout_constraintTop_toTopOf="@+id/writing_image"
-            tools:text="Friday May-05-2021 15:45" />
+            android:orientation="vertical"
+            android:onClick="@{() -> clickListener.onClick(journalEntry)}">
 
-        <TextView
-            android:id="@+id/list_element_count"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="@dimen/margin"
-            app:journalEntrySmartTruncate="@{journalEntry}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/writing_image"
-            app:layout_constraintTop_toBottomOf="@+id/list_creation_date"
-            tools:text="I had a good day..." />
+            <ImageView
+                android:id="@+id/writing_image"
+                style="ImageAppearance.ListIcon"
+                app:tint="@color/cardIconImageTintColor"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:contentDescription="@string/journal_list_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_write_black_24dp"
+                tools:srcCompat="@drawable/ic_write_black_24dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/list_creation_date"
+                style="@style/TextAppearance.Title"
+                app:journalEntryCreatedDate="@{journalEntry}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/writing_image"
+                app:layout_constraintTop_toTopOf="@+id/writing_image"
+                tools:text="Friday May-05-2021 15:45" />
+
+            <TextView
+                android:id="@+id/list_element_count"
+                style="@style/TextAppearance.Subtitle"
+                app:journalEntrySmartTruncate="@{journalEntry}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/writing_image"
+                app:layout_constraintTop_toBottomOf="@+id/list_creation_date"
+                tools:text="I had a good day..." />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
 </layout>

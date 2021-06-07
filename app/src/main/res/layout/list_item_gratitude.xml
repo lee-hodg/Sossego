@@ -15,47 +15,49 @@
             type="com.example.android.sossego.ui.gratitude.listing.GratitudeListListener" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:onClick="@{() -> clickListener.onClick(gratitudeList)}">
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardViewStyle">
 
-        <ImageView
-            android:id="@+id/prayer_image"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="60dp"
-            android:background="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_pray"
-            tools:srcCompat="@drawable/ic_pray"
-            android:contentDescription="@string/gratitude_list_image" />
 
-        <TextView
-            android:id="@+id/list_creation_date"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin"
-            android:layout_marginEnd="@dimen/margin"
-            android:textStyle="bold"
-            app:gratitudeListCreatedDate="@{gratitudeList}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/prayer_image"
-            app:layout_constraintTop_toTopOf="@+id/prayer_image"
-            tools:text="Friday May-05-2021 15:45" />
+            android:onClick="@{() -> clickListener.onClick(gratitudeList)}"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/list_element_count"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="@dimen/margin"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/prayer_image"
-            app:layout_constraintTop_toBottomOf="@+id/list_creation_date"
-            tools:text="Items: 10" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/prayer_image"
+                style="ImageAppearance.ListIcon"
+                app:tint="@color/cardIconImageTintColor"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="60dp"
+                android:contentDescription="@string/gratitude_list_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_pray"
+                tools:srcCompat="@drawable/ic_pray" />
+
+            <TextView
+                android:id="@+id/list_creation_date"
+                style="@style/TextAppearance.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:gratitudeListCreatedDate="@{gratitudeList}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/prayer_image"
+                app:layout_constraintTop_toTopOf="@+id/prayer_image"
+                tools:text="Friday May-05-2021 15:45" />
+
+            <TextView
+                android:id="@+id/list_element_count"
+                style="@style/TextAppearance.Subtitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/prayer_image"
+                app:layout_constraintTop_toBottomOf="@+id/list_creation_date"
+                tools:text="Items: 10" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 </layout>

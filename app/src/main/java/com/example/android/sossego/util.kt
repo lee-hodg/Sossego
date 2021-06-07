@@ -18,7 +18,7 @@ fun convertLongToDateString(systemTime: Long): String {
 
 @SuppressLint("SimpleDateFormat")
 fun convertTimestampToMonthYear(systemTime: Long): String {
-    return SimpleDateFormat("MMMM-yyyy")
+    return SimpleDateFormat("MMMM yyyy")
         .format(systemTime).toString()
 }
 

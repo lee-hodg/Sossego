@@ -10,13 +10,12 @@
     <color name="secondaryTextColor">#ffffff</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
-    <color name="textBackgroundBox">@color/primaryLightColor</color>
-    <color name="textBackgroundBoxTextColor">@color/primaryTextColor</color>
-    <color name="dangerRed">#D12626</color>
-    <color name="customViewBackground">@color/white</color>
-    <color name="cardBorderColor">@color/primaryColor</color>
-    <color name="cardBackgroundColor">@color/white</color>
-    <color name="cardTitleTextColor">#555555</color>
+    <color name="textBackgroundBox">#383838</color>
+    <color name="textBackgroundBoxTextColor">@color/white</color>
+    <color name="customViewBackground">#121212</color>
+    <color name="cardBorderColor">@color/white</color>
+    <color name="cardBackgroundColor">#121212</color>
+    <color name="cardTitleTextColor">@color/white</color>
     <color name="cardSubTitleTextColor">@color/white</color>
-    <color name="cardIconImageTintColor">@color/black</color>
+    <color name="cardIconImageTintColor">@color/white</color>
 </resources>

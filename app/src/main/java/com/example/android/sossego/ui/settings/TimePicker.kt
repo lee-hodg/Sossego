@@ -33,20 +33,24 @@ class TimePickerPreference(context: Context?, attrs: AttributeSet?) : Preference
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
+        val act = context as MainActivity
+
+        val reminderHourKey = act.getString(R.string.reminder_hour)
+        val reminderMinuteKey = act.getString(R.string.reminder_minute)
+
         sharedPrefs = getDefaultSharedPreferences(context)
-        currentHour = sharedPrefs.getString("reminder_hour", "9").toString()
-        currentMinute = sharedPrefs.getString("reminder_minute", "0").toString()
+        currentHour = sharedPrefs.getString(reminderHourKey, "9").toString()
+        currentMinute = sharedPrefs.getString(reminderMinuteKey, "0").toString()
         super.onBindViewHolder(holder)
         binding = TimePickerRowBinding.bind(holder.itemView)
 
         // Format the time correctly
         val currentTime = LocalTime.of(currentHour.toInt(), currentMinute.toInt())
 
-        binding.timePickerDescription.text =
-            String.format(
-                context.getString(R.string.notification_hour_description),
-                "~${formatter.format(currentTime)}"
-            )
+        binding.timePickerDescription.text = String.format(
+            context.getString(R.string.notification_hour_description),
+            "~${formatter.format(currentTime)}"
+        )
 
         binding.root.setOnClickListener(this)
     }
@@ -80,11 +84,10 @@ class TimePickerPreference(context: Context?, attrs: AttributeSet?) : Preference
             // Format the selected hour and update the text
             val currentTime = LocalTime.of(picker.hour, picker.minute)
 
-            binding.timePickerDescription.text =
-                String.format(
-                    context.getString(R.string.notification_hour_description),
-                    "~${formatter.format(currentTime)}"
-                )
+            binding.timePickerDescription.text = String.format(
+                context.getString(R.string.notification_hour_description),
+                "~${formatter.format(currentTime)}"
+            )
         }
 
         picker.show(act.supportFragmentManager, "timepicker")

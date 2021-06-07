@@ -37,7 +37,10 @@ class TimerClockView @JvmOverloads constructor(
             invalidate()
         }
 
-    private val waterColor = ResourcesCompat.getColor(resources, R.color.water_blue,
+    private val backgroundColor = ResourcesCompat.getColor(resources, R.color.customViewBackground,
+        context.theme)
+
+    private val waterColor = ResourcesCompat.getColor(resources, R.color.primaryColor,
         context.theme)
 
     private val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -86,7 +89,7 @@ class TimerClockView @JvmOverloads constructor(
 
         if(fractionRemaining == 0.0f || fractionRemaining == 1.0f){
             Timber.tag(TAG).d("fractionRemaining $fractionRemaining clear canvas")
-            canvas.drawColor(Color.WHITE)
+            canvas.drawColor(backgroundColor)
         }else {
             val remainingTimeSeconds = remainingTimeMilliseconds/1000
             // Draw the donut.

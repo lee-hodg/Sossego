@@ -99,7 +99,7 @@
             android:layout_marginBottom="@dimen/margin"
             android:onClick="@{() -> gratitudeDetailViewModel.deleteGratitudeList()}"
             android:text="@string/delete_button_text"
-            app:backgroundTint="#D12626"
+            app:backgroundTint="@color/dangerRed"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

@@ -38,7 +38,10 @@ class WaterLevelView @JvmOverloads constructor(
 
     private val waterDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_wave2,
         context.theme)
-    private val waterColor = ResourcesCompat.getColor(resources, R.color.water_blue,
+    private val waterColor = ResourcesCompat.getColor(resources, R.color.primaryColor,
+        context.theme)
+
+    private val backgroundColor = ResourcesCompat.getColor(resources, R.color.customViewBackground,
         context.theme)
 
     private fun drawableToBitmap(drawable: Drawable): Bitmap? {
@@ -140,7 +143,7 @@ class WaterLevelView @JvmOverloads constructor(
         if(fractionRemaining == 0.0f || fractionRemaining == 1.0f){
             Timber.tag(TAG).d("fractionRemaining $fractionRemaining clear canvas")
             //clear
-            canvas.drawColor(Color.WHITE)
+            canvas.drawColor(backgroundColor)
         }else {
             waterHeight = fractionRemaining * (this.height - waveSurfaceHeight)
             Timber.tag(TAG).d("fractionRemaining $fractionRemaining: draw water/shower")

@@ -18,14 +18,15 @@
 <!--        android:onValueChange="@{(picker,oldv,newv) -> mediationTimerViewModel.setTimeSelected(newv)}"-->
         <NumberPicker
             android:id="@+id/number_picker"
+            android:editTextColor="@color/primaryColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"
+            android:enabled="@{!mediationTimerViewModel.isAlarmOn}"
             android:value="@={mediationTimerViewModel.timeSelection}"
             app:layout_constraintEnd_toStartOf="@id/on_off_switch"
             app:layout_constraintStart_toStartOf="parent"
-            android:enabled="@{!mediationTimerViewModel.isAlarmOn}"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
@@ -64,6 +65,7 @@
             android:layout_marginBottom="32dp"
             app:fractionRemaining="@{mediationTimerViewModel.fractionRemaining}"
             app:layoutDescription="@xml/water_scene"
+            android:background="@color/customViewBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
