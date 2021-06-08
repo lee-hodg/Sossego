@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.sossego.R
+import com.example.android.sossego.afterMeasured
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.quotes.database.QuoteDatabase
@@ -109,6 +110,9 @@ class GratitudeFragment : Fragment(), KoinComponent {
         val binding: FragmentGratitudeBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_gratitude, container, false)
 
+        Timber.tag(TAG).d("Set the progress bar to be visible...")
+        binding.progressBar.visibility = View.VISIBLE
+
         // Build view model with access to the database by using a factory
         val application = requireNotNull(this.activity).application
         val viewModelFactory = GratitudeViewModelFactory(gratitudeRepository, application)
@@ -189,6 +193,7 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
                 gratitudeListAdapter.submitGratitudeList(sortedGratitudeList)
 
+
             }
 
             override fun onCancelled(p0: DatabaseError) {
@@ -238,6 +243,12 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
         // Set our recyclerview to use this adapter
         binding.gratitudeListRecycler.adapter = gratitudeListAdapter
+
+
+        binding.gratitudeListRecycler.afterMeasured {
+            Timber.tag(TAG).d("afterMeasured. Set the progress bar to be GONE...")
+            binding.progressBar.visibility = View.GONE
+        }
 
         // Swipe to delete action
         val swipeHandler = object : SwipeToDeleteCallback(this.requireContext()) {
