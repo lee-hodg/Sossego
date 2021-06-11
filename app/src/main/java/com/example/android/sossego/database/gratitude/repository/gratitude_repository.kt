@@ -8,43 +8,43 @@ import com.google.firebase.database.ValueEventListener
  *  The repository handling database operations
  */
 class GratitudeRepository(
-    private val mAppDatabase: AppDatabase = AppDatabase.getInstance()) {
+    private val mAppDatabase: AppDatabase = AppDatabase.getInstance()) : IGratitudeRepository {
 
-    fun addGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener){
+    override fun addGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener){
         return mAppDatabase.addGratitudeListValueEventListener(userId, valueEventListener)
     }
 
-    fun removeGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener){
+    override fun removeGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener){
         return mAppDatabase.removeGratitudeListValueEventListener(userId, valueEventListener)
     }
 
-    fun addGratitudeListDetailValueEventListener(valueEventListener: ValueEventListener,
-                                                 childKey: String){
+    override fun addGratitudeListDetailValueEventListener(valueEventListener: ValueEventListener,
+                                                          childKey: String){
         return mAppDatabase.addGratitudeListDetailValueEventListener(valueEventListener, childKey)
     }
 
-    fun createGratitudeList(userId: String): String {
+    override fun createGratitudeList(userId: String): String {
         return mAppDatabase.createGratitudeList(userId=userId)
     }
 
-    fun removeGratitudeList(parentListKey: String) {
+    override fun removeGratitudeList(parentListKey: String) {
         mAppDatabase.removeGratitudeList(parentListKey)
     }
 
-    fun addGratitudeListItem(parentListId: String, gratitudeItemText: String) {
+    override fun addGratitudeListItem(parentListId: String, gratitudeItemText: String) {
         return mAppDatabase.addGratitudeItem(parentListId, gratitudeItemText)
     }
 
-    fun updateGratitudeItem(parentListKey: String, childItemKey: String, updatedText: String){
+    override fun updateGratitudeItem(parentListKey: String, childItemKey: String, updatedText: String){
         mAppDatabase.updateGratitudeItem(parentListKey, childItemKey, updatedText)
     }
 
-    fun removeGratitudeItem(parentListKey: String, childItemKey: String){
+    override fun removeGratitudeItem(parentListKey: String, childItemKey: String){
         mAppDatabase.removeGratitudeItem(parentListKey, childItemKey)
     }
 
 
-    fun clearGratitudeItems(parentListKey: String){
+    override fun clearGratitudeItems(parentListKey: String){
         mAppDatabase.clearGratitudeItems(parentListKey)
     }
 

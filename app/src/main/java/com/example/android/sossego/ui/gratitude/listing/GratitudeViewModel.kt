@@ -1,14 +1,13 @@
 package com.example.android.sossego.ui.gratitude.listing
 
-import android.app.Application
 import androidx.lifecycle.*
-import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
+import com.example.android.sossego.database.gratitude.repository.IGratitudeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GratitudeViewModel(
-    private val gratitudeRepository: GratitudeRepository
+    private val gratitudeRepository: IGratitudeRepository
 ) : ViewModel() {
 
     // How many consecutive logins
