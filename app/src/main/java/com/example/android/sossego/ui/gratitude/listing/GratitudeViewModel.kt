@@ -8,9 +8,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GratitudeViewModel(
-    private val gratitudeRepository: GratitudeRepository,
-    application: Application
-) : AndroidViewModel(application) {
+    private val gratitudeRepository: GratitudeRepository
+) : ViewModel() {
 
     // How many consecutive logins
     var streakCount = MutableLiveData(1)

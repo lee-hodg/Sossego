@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -50,7 +51,11 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
     private val userRepository: UserRepository by inject()
 
-    private lateinit var gratitudeViewModel: GratitudeViewModel
+//    private lateinit var gratitudeViewModel: GratitudeViewModel
+
+    private val gratitudeViewModel by viewModels<GratitudeViewModel> {
+        GratitudeViewModelFactory(GratitudeRepository())
+    }
 
     private lateinit var gratitudeListListener: ValueEventListener
 
@@ -115,10 +120,6 @@ class GratitudeFragment : Fragment(), KoinComponent {
 
         // Build view model with access to the database by using a factory
         val application = requireNotNull(this.activity).application
-        val viewModelFactory = GratitudeViewModelFactory(gratitudeRepository, application)
-        gratitudeViewModel = ViewModelProvider(
-                this, viewModelFactory).get(GratitudeViewModel::class.java)
-
 
         // Observe the authentication state so we can know if the user has logged in successfully.
         // We record this state on the gratitudeViewModel

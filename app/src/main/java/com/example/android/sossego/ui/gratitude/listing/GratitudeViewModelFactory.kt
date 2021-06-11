@@ -1,6 +1,5 @@
 package com.example.android.sossego.ui.gratitude.listing
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
@@ -10,13 +9,12 @@ import com.example.android.sossego.database.gratitude.repository.GratitudeReposi
  *
  */
 class GratitudeViewModelFactory(
-    private val gratitudeRepository: GratitudeRepository,
-    private val application: Application
+    private val gratitudeRepository: GratitudeRepository
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GratitudeViewModel::class.java)) {
-            return GratitudeViewModel(gratitudeRepository, application) as T
+            return GratitudeViewModel(gratitudeRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
