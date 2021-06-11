@@ -126,8 +126,16 @@ dependencies {
     // testing
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.powermock:powermock:1.6.5'
-    testImplementation 'org.powermock:powermock-module-junit4:1.6.5'
-    testImplementation 'org.powermock:powermock-api-mockito:1.6.5'
+//    testImplementation 'org.powermock:powermock-module-junit4:1.6.5'
+//    testImplementation 'org.powermock:powermock-api-mockito:1.6.5'
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.0-beta.5'
+    // Add the following for InstantTaskExecutorRule class. https://stackoverflow.com/a/56073388
+    // which is needed when we want to deal with livedata in tests
+    // testImplementation 'androidx.arch.core:core-testing:2.1.0'
+    testImplementation 'android.arch.core:core-testing:1.1.1'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3'
+
 
     // android testing
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
