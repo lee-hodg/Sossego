@@ -28,6 +28,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import org.powermock.modules.junit4.PowerMockRunnerDelegate
 
+/**
+ * These tests mock out the FirebaseDatabase completely
+ * It may have been easier and just as useful to simply create a FakeGratitudeRepository
+ * based on a common interface then check the same things with that
+ */
 
 @RunWith(PowerMockRunner::class)
 @PowerMockRunnerDelegate(MockitoJUnitRunner::class) //this line allows you to use the powermock runner and mockito runner
