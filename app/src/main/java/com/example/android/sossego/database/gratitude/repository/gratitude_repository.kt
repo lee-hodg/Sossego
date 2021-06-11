@@ -1,12 +1,14 @@
 package com.example.android.sossego.database.gratitude.repository
 
+import com.example.android.sossego.database.AppDatabase
 import com.example.android.sossego.database.BaseRepository
 import com.google.firebase.database.ValueEventListener
 
 /**
  *  The repository handling database operations
  */
-class GratitudeRepository private constructor() : BaseRepository() {
+class GratitudeRepository(
+    private val mAppDatabase: AppDatabase = AppDatabase.getInstance()) {
 
     fun addGratitudeListValueEventListener(userId: String, valueEventListener: ValueEventListener){
         return mAppDatabase.addGratitudeListValueEventListener(userId, valueEventListener)

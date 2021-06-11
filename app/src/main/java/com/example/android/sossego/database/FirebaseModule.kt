@@ -13,9 +13,13 @@ import timber.log.Timber
 import java.util.*
 
 
-class AppDatabase private constructor() {
+/**
+ * Dependency inject the database for testing
+ */
+class AppDatabase constructor(private val database: FirebaseDatabase = FirebaseDatabase.getInstance()) {
 
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+//    private val database: FirebaseDatabase = firebaseDatabase
+
     private lateinit var dbRootRef: DatabaseReference
     private lateinit var gratitudeListNode: DatabaseReference
     private lateinit var journalEntryNode: DatabaseReference
@@ -195,11 +199,12 @@ class AppDatabase private constructor() {
 
         private var appDatabase: AppDatabase? = null
 
-        fun getInstance(): AppDatabase {
+        fun getInstance(firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()): AppDatabase {
             synchronized(this) {
 
                 if (appDatabase == null) {
-                    appDatabase = AppDatabase()
+                    appDatabase =  AppDatabase(database = firebaseDatabase)
+
                     appDatabase!!.database.setPersistenceEnabled(true)
                     appDatabase!!.dbRootRef = appDatabase!!.database.reference
                     appDatabase!!.gratitudeListNode = appDatabase!!.dbRootRef.child("gratitude_lists")
