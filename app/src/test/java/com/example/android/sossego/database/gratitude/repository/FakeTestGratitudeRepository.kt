@@ -41,6 +41,10 @@ class FakeTestGratitudeRepository(
         return newListId
     }
 
+    override fun clearGratitudeItems(parentListKey: String) {
+        gratitudeLists?.clear()
+    }
+
     override fun removeGratitudeList(parentListKey: String) {
         TODO("Not yet implemented")
     }
@@ -61,7 +65,5 @@ class FakeTestGratitudeRepository(
         TODO("Not yet implemented")
     }
 
-    override fun clearGratitudeItems(parentListKey: String) {
-        TODO("Not yet implemented")
-    }
+
 }
