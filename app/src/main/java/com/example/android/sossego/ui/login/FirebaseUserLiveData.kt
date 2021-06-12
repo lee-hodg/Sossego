@@ -3,6 +3,8 @@ package com.example.android.sossego.ui.login
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.FirebaseAuth
 import androidx.lifecycle.LiveData
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 /**
  * This class observes the current FirebaseUser. If there is no logged in user, FirebaseUser will
@@ -13,8 +15,12 @@ import androidx.lifecycle.LiveData
  * nature of your LiveData object, but is okay for this purpose since we are only adding and
  * removing the authStateListener.
  */
-class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
-    private val firebaseAuth = FirebaseAuth.getInstance()
+class FirebaseUserLiveData : LiveData<FirebaseUser?>(), KoinComponent {
+    private val firebaseAuth: FirebaseAuth by inject()
+
+//    init{
+//        firebaseAuth.useEmulator("10.0.2.2", 9099)
+//    }
 
     // set the value of this FireUserLiveData object by hooking it up to equal the value of the
     //  current FirebaseUser. Utilize the FirebaseAuth.AuthStateListener callback to get

@@ -29,6 +29,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,6 +72,22 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun initKoin() {
+
+
+        val firebaseDatabaseModule = module {
+            single {
+                FirebaseDatabase.getInstance()
+            }
+
+        }
+
+        val firebaseAuthModule = module {
+            single {
+                FirebaseAuth.getInstance()
+            }
+
+        }
+
         val gratitudeModule = module {
             single {
                 GratitudeRepository.getInstance()
@@ -101,7 +118,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             // declare used Android context
             androidContext(applicationContext)
             // declare modules
-            modules(listOf(gratitudeModule, journalModule, userModule, loginModule))
+            modules(listOf(firebaseDatabaseModule, firebaseAuthModule,
+                gratitudeModule, journalModule, userModule, loginModule))
         }
     }
 

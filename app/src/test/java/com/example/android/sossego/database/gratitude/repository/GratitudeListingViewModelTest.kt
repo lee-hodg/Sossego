@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.runBlockingTest
 
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,7 +20,7 @@ import org.junit.Test
  * This way we don't actually mock out Firebase, we just fake the gratitude repo,
  * which is somewhat easier
  */
-class GratitudeListingTest {
+class GratitudeListingViewModelTest {
 
     private lateinit var gratitudeRepository: FakeTestGratitudeRepository
 

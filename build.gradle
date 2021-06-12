@@ -20,6 +20,7 @@ buildscript {
         version_firebase_auth_ui = "5.0.0"
         preference_version = "1.1.1"
         version_cardview = "1.0.0"
+        fragmentVersion = "1.1.0-alpha07"
     }
 
 

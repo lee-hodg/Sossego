@@ -9,6 +9,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 import java.util.*
 
@@ -16,9 +18,9 @@ import java.util.*
 /**
  * Dependency inject the database for testing
  */
-class AppDatabase constructor(private val database: FirebaseDatabase = FirebaseDatabase.getInstance()) {
+class AppDatabase: KoinComponent {
 
-//    private val database: FirebaseDatabase = firebaseDatabase
+    private val database: FirebaseDatabase by inject()
 
     private lateinit var dbRootRef: DatabaseReference
     private lateinit var gratitudeListNode: DatabaseReference
@@ -199,12 +201,13 @@ class AppDatabase constructor(private val database: FirebaseDatabase = FirebaseD
 
         private var appDatabase: AppDatabase? = null
 
-        fun getInstance(firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()): AppDatabase {
+        fun getInstance(): AppDatabase {
+
             synchronized(this) {
+                // firebaseDatabase.useEmulator("10.0.2.2", 9000)
 
                 if (appDatabase == null) {
-                    appDatabase =  AppDatabase(database = firebaseDatabase)
-
+                    appDatabase =  AppDatabase()
                     appDatabase!!.database.setPersistenceEnabled(true)
                     appDatabase!!.dbRootRef = appDatabase!!.database.reference
                     appDatabase!!.gratitudeListNode = appDatabase!!.dbRootRef.child("gratitude_lists")
