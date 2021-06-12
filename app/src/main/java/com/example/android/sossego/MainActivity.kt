@@ -13,6 +13,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -73,53 +74,29 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initKoin() {
 
-
-        val firebaseDatabaseModule = module {
-            single {
-                FirebaseDatabase.getInstance()
-            }
-
-        }
-
-        val firebaseAuthModule = module {
-            single {
-                FirebaseAuth.getInstance()
-            }
-
-        }
-
-        val gratitudeModule = module {
+        val myModule = module {
+            single {FirebaseDatabase.getInstance()}
+            single {FirebaseAuth.getInstance()}
             single {
                 GratitudeRepository.getInstance()
             }
-
-        }
-
-        val journalModule = module {
             single {
                 JournalRepository.getInstance()
             }
-        }
-
-        val userModule = module {
             single {
                 UserRepository.getInstance()
             }
-        }
-
-        val loginModule = module {
             single {
                 LoginViewModel()
             }
         }
 
-            // start Koin!
+        // start Koin!
         startKoin {
             // declare used Android context
             androidContext(applicationContext)
             // declare modules
-            modules(listOf(firebaseDatabaseModule, firebaseAuthModule,
-                gratitudeModule, journalModule, userModule, loginModule))
+            modules(listOf(myModule))
         }
     }
 
@@ -235,7 +212,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
-        val navController = findNavController(R.id.nav_host_fragment)
+        // val navController = findNavController(R.id.nav_host_fragment)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
