@@ -33,19 +33,16 @@ class GratitudeListingTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    @Before
-    fun before() {
-        gratitudeRepository = FakeTestGratitudeRepository()
-    }
-
 
     @ExperimentalCoroutinesApi
     @Test
     fun addGratitudeList_NavigatesToCorrectDetail() = mainCoroutineRule.runBlockingTest {
 
         // GIVEN
+        gratitudeRepository = FakeTestGratitudeRepository()
         val gratitudeViewModel = GratitudeViewModel(gratitudeRepository)
         gratitudeViewModel.setAuthenticatedUserId("SOME-USER-ID")
+        assertThat(gratitudeRepository.gratitudeLists?.size , `is`(0))
 
         // WHEN - We add a new list
         gratitudeViewModel.addNewGratitudeList()
@@ -56,6 +53,7 @@ class GratitudeListingTest {
             value,
             notNullValue()
         )
+        assertThat(gratitudeRepository.gratitudeLists?.size , `is`(1))
 
     }
 }

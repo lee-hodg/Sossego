@@ -5,7 +5,7 @@ import com.google.firebase.database.ValueEventListener
 import java.util.*
 
 class FakeTestGratitudeRepository(
-    private var gratitudeLists: MutableList<FirebaseGratitudeList>? = mutableListOf()): IGratitudeRepository {
+    public var gratitudeLists: MutableList<FirebaseGratitudeList>? = mutableListOf()): IGratitudeRepository {
     override fun addGratitudeListValueEventListener(
         userId: String,
         valueEventListener: ValueEventListener
