@@ -67,7 +67,7 @@ import org.koin.test.AutoCloseKoinTest
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
+class GratitudeListingFragmentTest: AutoCloseKoinTest() {
 
     private lateinit var appContext: Application
     private lateinit var firebaseAuth: FirebaseAuth

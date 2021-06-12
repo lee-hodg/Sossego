@@ -103,7 +103,9 @@ class WaterLevelView @JvmOverloads constructor(
 
             newDroplet.translationX = Math.random().toFloat() *
                     containerW - tempDropletW / 2
-            newDroplet.translationY = -tempDropletH
+            // newDroplet.translationY = -tempDropletH
+            newDroplet.translationY = -(tempDropletH * 1.5f)
+
 
             container.addView(newDroplet)
 
