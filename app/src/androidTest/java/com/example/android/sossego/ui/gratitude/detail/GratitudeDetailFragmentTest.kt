@@ -166,7 +166,5 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         Espresso.onView(withId(R.id.greeting_tv))
             .check(matches(withSubstring(displayName)))
 
-        Thread.sleep(4000)
-
     }
 }
