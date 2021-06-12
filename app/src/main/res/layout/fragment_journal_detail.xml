@@ -22,12 +22,24 @@
 
 
         <!--        2-way binding has @=-->
+        <ImageView
+            android:id="@+id/journalRandomImageView"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_margin="@dimen/margin"
+            app:setImageUrl="@{&quot; https://picsum.photos/500/200?grayscale&amp;blur &quot;}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/ic_broken_image" />
+
         <EditText
             android:id="@+id/journal_entry_edit_text"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="@dimen/margin"
-            android:layout_marginTop="@dimen/margin"
+            android:layout_marginTop="595dp"
+            android:layout_marginBottom="32dp"
             android:background="@color/textBackgroundBox"
             android:gravity="top"
             android:hint="@string/journal_entry_hint"
@@ -40,7 +52,7 @@
             app:layout_constraintBottom_toTopOf="@+id/journal_entry_detail_save_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/journalRandomImageView" />
 
 <!--        -->
 
