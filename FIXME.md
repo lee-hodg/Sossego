@@ -9,8 +9,6 @@
 
 - My reminders seem to have more than 1 time per day???
 
-- Why do the rain drops not totally position off screen in meditation animation?
-
 - If quickly toggle the time intervals sometimes errors?
 
 - Sometimes it seems the bell rings at end of time even if alarm was supposed to be cancelled.
@@ -19,8 +17,6 @@
 
 - The streak count tracking is it robust or not?
 
-- - Should I add glide, plus pics with loading spinner to fulfil some of rubric? Journal entries could have a photo
-for example, but ugh storage...maybe will wait until they hard complain on that
 
 # FUTURE
 

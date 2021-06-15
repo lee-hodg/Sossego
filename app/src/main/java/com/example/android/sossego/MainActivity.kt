@@ -19,6 +19,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import androidx.work.*
+import com.example.android.sossego.database.AppDatabase
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.database.quotes.work.RefreshDataWorker
@@ -75,7 +76,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun initKoin() {
 
         val myModule = module {
-            single {FirebaseDatabase.getInstance()}
+            single {
+                val firebaseDatabase = FirebaseDatabase.getInstance()
+                firebaseDatabase.setPersistenceEnabled(true)
+            }
             single {FirebaseAuth.getInstance()}
             single {
                 GratitudeRepository.getInstance()
