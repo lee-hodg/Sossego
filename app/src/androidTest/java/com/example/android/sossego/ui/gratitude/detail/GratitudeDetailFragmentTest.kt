@@ -3,13 +3,16 @@ package com.example.android.sossego.ui.gratitude.detail
 import android.app.Application
 import android.util.Log
 import android.view.KeyEvent
+
 import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.android.sossego.EspressoIdlingResource
@@ -31,6 +34,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.Matchers.`is`
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +44,8 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
+import org.mockito.Mockito
+import java.lang.AssertionError
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -280,10 +286,12 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
             // the below seems to run on ui thread anyway
             Log.d(TAG, "Try to create bundle with $gratitudeListKey")
             val bundle = bundleOf("gratitudeListIdKey" to gratitudeListKey)
-            launchFragmentInContainer<GratitudeDetailFragment>(
+            val scenario = launchFragmentInContainer<GratitudeDetailFragment>(
                 bundle,
                 R.style.Theme_Sossego
             )
+            dataBindingIdlingResource.monitorFragment(scenario)
+
 
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(0))
@@ -310,10 +318,11 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         // the below seems to run on ui thread anyway
         Log.d(TAG, "Try to create bundle with $gratitudeListKey")
         val bundle = bundleOf("gratitudeListIdKey" to gratitudeListKey)
-        launchFragmentInContainer<GratitudeDetailFragment>(
+        val scenario = launchFragmentInContainer<GratitudeDetailFragment>(
             bundle,
             R.style.Theme_Sossego
         )
+        dataBindingIdlingResource.monitorFragment(scenario)
 
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(3))
@@ -347,6 +356,7 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         // Initially 1
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(1))
+        verifyListItemCount(gratitudeListKey, 1)
 
         // Now let's type and press Add and check we got 2
         onView(withId(R.id.new_gratitude_item)).perform(clearText(),typeText("Kotlin"))
@@ -356,6 +366,8 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         // doesn't know to wait
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(2))
+        verifyListItemCount(gratitudeListKey, 2)
+
 
     }
 
@@ -387,6 +399,8 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         // Initially 1
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(1))
+        verifyListItemCount(gratitudeListKey, 1)
+
 
         // Now let's type and press Add and check we got 2
         onView(withId(R.id.new_gratitude_item)).perform(clearText(),typeText("Buttons"))
@@ -395,6 +409,7 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         onView(withId(R.id.new_gratitude_item)).perform(clearText(),typeText("Lists"))
         // Click the add button
         onView(withId(R.id.add_item_button)).perform(click())
+        verifyListItemCount(gratitudeListKey, 3)
 
         // Note that we need to use the idling resources or this happens too quickly and espresso
         // doesn't know to wait
@@ -440,4 +455,94 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(0))
     }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun deleteButton_removesAndNavigates() = runBlockingTest {
+        if(!writeSucceeded) {
+            Log.e(TAG, "Setup must have failed. Exit")
+            return@runBlockingTest
+        }
+
+        // the below seems to run on ui thread anyway
+        Log.d(TAG, "Try to create bundle with $gratitudeListKey")
+        val bundle = bundleOf("gratitudeListIdKey" to gratitudeListKey)
+        val scenario = launchFragmentInContainer<GratitudeDetailFragment>(
+            bundle,
+            R.style.Theme_Sossego
+        )
+        dataBindingIdlingResource.monitorFragment(scenario)
+        val navController = Mockito.mock(NavController::class.java)
+        scenario.onFragment {
+            Navigation.setViewNavController(it.view!!, navController)
+        }
+        // GIVEN 1 list
+        verify_list_count(1)
+
+
+        // WHEN -  click delete button
+        onView(withId(R.id.gratitude_detail_delete_btn)).perform(click())
+
+        // THEN - nav back to listing
+        Mockito.verify(navController).navigate(
+            GratitudeDetailFragmentDirections.actionNavigationGratitudeDetailFragmentToHome())
+
+        // and no gratitude lists left
+        verify_list_count(0)
+
+    }
+
+    private fun verify_list_count(expectedCount: Int) {
+        val waitCountSignal = CountDownLatch(1)
+        var gratitudeListCount = 1
+        firebaseDatabase.reference.child("gratitude_lists").orderByChild("userId")
+            .equalTo(firebaseAuth.currentUser!!.uid).get().addOnCompleteListener { task ->
+
+                if (task.isSuccessful) {
+                    val children = task.result!!.children
+                    gratitudeListCount = children.count()
+
+                    Log.d(TAG, "waitCountSignal release")
+                    waitCountSignal.countDown()
+                } else {
+                    Log.e(TAG, "Could not count lists")
+                }
+
+
+            }
+        Log.d(TAG, "await count Signal")
+        if (waitCountSignal.await(10, TimeUnit.SECONDS)) {
+            assertThat(gratitudeListCount, `is`(expectedCount))
+        } else {
+            throw AssertionError("Could not get count to do check")
+        }
+    }
+
+    private fun verifyListItemCount(parentListKey: String, expectedCount: Int) {
+        val waitCountSignal = CountDownLatch(1)
+        var listItemCount: Int? = null
+        firebaseDatabase.reference.child("gratitude_lists").child(parentListKey).child("gratitudeItems")
+            .get().addOnCompleteListener { task ->
+
+                if (task.isSuccessful) {
+                    val children = task.result!!.children
+                    listItemCount = children.count()
+
+                    Log.d(TAG, "waitCountSignal release")
+                    waitCountSignal.countDown()
+                } else {
+                    Log.e(TAG, "Could not count list items")
+                }
+
+
+            }
+        Log.d(TAG, "await count Signal")
+        if (waitCountSignal.await(10, TimeUnit.SECONDS)) {
+            assertThat(listItemCount, `is`(expectedCount))
+        } else {
+            throw AssertionError("Could not get count to do check")
+        }
+    }
 }
+
+
