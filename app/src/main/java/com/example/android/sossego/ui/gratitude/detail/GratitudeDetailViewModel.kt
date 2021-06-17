@@ -4,17 +4,25 @@ import androidx.lifecycle.*
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeItem
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
+import com.example.android.sossego.wrapEspressoIdlingResource
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 
 class GratitudeDetailViewModel (
     private val gratitudeListKey: String,
     private val gratitudeRepository: GratitudeRepository
-    ) : ViewModel() {
+    ) : ViewModel(), KoinComponent {
 
     var gratitudeList: FirebaseGratitudeList? = null
+
+    // Inject this so that in tests it is easy to swap for TestCoroutineDispatcher vs Dispatchers.IO
+    // on prod
+    private val ioDispatcher: CoroutineDispatcher by inject()
 
 
     // Initial value of EditText for new gratitude items being added
@@ -61,78 +69,101 @@ class GratitudeDetailViewModel (
     }
 
     private suspend fun deleteItem(gratitudeItemId: String) {
-        withContext(Dispatchers.IO) {
-            Timber.d("Pretend to delete item $gratitudeItemId")
-            gratitudeRepository.removeGratitudeItem(gratitudeListKey, gratitudeItemId)
+        wrapEspressoIdlingResource {
+            withContext(ioDispatcher) {
+                Timber.d("Pretend to delete item $gratitudeItemId")
+                gratitudeRepository.removeGratitudeItem(gratitudeListKey, gratitudeItemId)
+            }
         }
     }
 
     fun deleteGratitudeItem(gratitudeItemId: String) {
-        Timber.d("Delete item with id $gratitudeItemId")
-        viewModelScope.launch {
+        wrapEspressoIdlingResource {
+            Timber.d("Delete item with id $gratitudeItemId")
+            viewModelScope.launch {
                 deleteItem(gratitudeItemId)
             }
+        }
 
     }
 
     private suspend fun insert(gratitudeItemText: String) {
-        withContext(Dispatchers.IO) {
-            gratitudeRepository.addGratitudeListItem(gratitudeListKey, gratitudeItemText)
+        wrapEspressoIdlingResource {
+            withContext(ioDispatcher) {
+                gratitudeRepository.addGratitudeListItem(gratitudeListKey, gratitudeItemText)
+            }
         }
     }
 
     fun addNewItem(){
-        viewModelScope.launch {
-            if(!newGratitudeItemText.value.isNullOrEmpty()) {
-                val newItemText = newGratitudeItemText.value.toString()
-                insert(newItemText)
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                if (!newGratitudeItemText.value.isNullOrEmpty()) {
+                    val newItemText = newGratitudeItemText.value.toString()
+                    insert(newItemText)
+                }
             }
-        }
 
-        // hide soft keyboard
-        //_hideSoftKeyboard.value = true
-        // clear
-        newGratitudeItemText.value = null
+            // hide soft keyboard
+            //_hideSoftKeyboard.value = true
+            // clear
+            newGratitudeItemText.value = null
+        }
     }
 
     private suspend fun deleteList() {
-        withContext(Dispatchers.IO) {
-            gratitudeRepository.removeGratitudeList(gratitudeListKey)
+        wrapEspressoIdlingResource {
+            withContext(ioDispatcher) {
+                gratitudeRepository.removeGratitudeList(gratitudeListKey)
+            }
         }
     }
 
     fun deleteGratitudeList(){
-        viewModelScope.launch {
-            deleteList()
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                deleteList()
+            }
+            // go back to listing
+            _navigateToGratitude.value = true
         }
-        // go back to listing
-        _navigateToGratitude.value = true
     }
 
     private suspend fun clearList() {
-        withContext(Dispatchers.IO) {
-            Timber.d("Clear gratitude items for parent list $gratitudeListKey")
-            gratitudeRepository.clearGratitudeItems(gratitudeListKey)
+        wrapEspressoIdlingResource {
+            {}
+            withContext(ioDispatcher) {
+                Timber.d("Clear gratitude items for parent list $gratitudeListKey")
+                gratitudeRepository.clearGratitudeItems(gratitudeListKey)
+            }
         }
     }
 
     fun clearGratitudeList(){
-        viewModelScope.launch {
-            clearList()
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                clearList()
+            }
         }
     }
 
     private suspend fun updateItem(gratitudeItem: FirebaseGratitudeItem) {
-        withContext(Dispatchers.IO) {
-            gratitudeRepository.updateGratitudeItem(gratitudeListKey, gratitudeItem.gratitudeItemId,
-                gratitudeItem.gratitudeText)
+        wrapEspressoIdlingResource {
+            withContext(ioDispatcher) {
+                gratitudeRepository.updateGratitudeItem(
+                    gratitudeListKey, gratitudeItem.gratitudeItemId,
+                    gratitudeItem.gratitudeText
+                )
+            }
         }
     }
 
     fun updateGratitudeItem(gratitudeItem: FirebaseGratitudeItem) {
-        Timber.d("Update item with id ${gratitudeItem.gratitudeItemId}")
-        viewModelScope.launch {
-            updateItem(gratitudeItem)
+        wrapEspressoIdlingResource {
+            Timber.d("Update item with id ${gratitudeItem.gratitudeItemId}")
+            viewModelScope.launch {
+                updateItem(gratitudeItem)
+            }
         }
 
     }

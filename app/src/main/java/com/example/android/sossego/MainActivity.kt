@@ -32,6 +32,7 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun initKoin() {
         val firebaseDatabase = FirebaseDatabase.getInstance()
         firebaseDatabase.setPersistenceEnabled(true)
+        val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 
         val myModule = module {
             single {
@@ -93,6 +95,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             single {
                 LoginViewModel()
+            }
+            single {
+                coroutineDispatcher
             }
         }
 

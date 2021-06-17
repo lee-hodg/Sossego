@@ -7,12 +7,15 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
+import com.example.android.sossego.EspressoIdlingResource
 import com.example.android.sossego.R
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeItem
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
@@ -21,11 +24,16 @@ import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.database.user.repository.UserRepository
 import com.example.android.sossego.ui.gratitude.detail.CustomAssertions.Companion.hasItemCount
 import com.example.android.sossego.ui.login.LoginViewModel
+import com.example.android.sossego.ui.util.DataBindingIdlingResource
+import com.example.android.sossego.ui.util.monitorFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
@@ -40,7 +48,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
 
@@ -58,7 +66,23 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
     companion object{
        private const val TAG = "GratDetailTest"
     }
+    // An Idling Resource that waits for Data Binding to have no pending bindings
+    private val dataBindingIdlingResource = DataBindingIdlingResource()
 
+    @Before
+    fun registerIdlingResource() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
+    }
+
+    /**
+     * Unregister your Idling Resource so it can be garbage collected and does not leak any memory.
+     */
+    @After
+    fun unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
+    }
 
     /**
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
@@ -77,6 +101,8 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         firebaseDatabase.useEmulator("10.0.2.2", 9000)
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseAuth.useEmulator("10.0.2.2", 9099)
+        val coroutineDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
+
         val myModule = module(override = true) {
 
             single { firebaseDatabase }
@@ -92,6 +118,9 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
             }
             single {
                 LoginViewModel()
+            }
+            single {
+                coroutineDispatcher
             }
         }
 
@@ -313,10 +342,12 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         // the below seems to run on ui thread anyway
         Log.d(TAG, "Try to create bundle with $gratitudeListKey")
         val bundle = bundleOf("gratitudeListIdKey" to gratitudeListKey)
-        launchFragmentInContainer<GratitudeDetailFragment>(
+        val scenario = launchFragmentInContainer<GratitudeDetailFragment>(
             bundle,
             R.style.Theme_Sossego
         )
+        dataBindingIdlingResource.monitorFragment(scenario)
+
         // Initially 1
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(1))
@@ -325,11 +356,10 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
         onView(withId(R.id.new_gratitude_item)).perform(clearText(),typeText("Kotlin"))
             .perform(pressKey(KeyEvent.KEYCODE_ENTER))
 
-        // Seems it happens to quickly for this...hmmmmm
+        // Note that we need to use the idling resources or this happens too quickly and espresso
+        // doesn't know to wait
         onView(withId(R.id.gratitude_detail_recycler))
             .check(hasItemCount(2))
-
-
 
     }
 
