@@ -8,6 +8,7 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -363,5 +364,85 @@ class GratitudeDetailFragmentTest: AutoCloseKoinTest() {
 
     }
 
+    @ExperimentalCoroutinesApi
+    @Test
+    fun newGratitudeList_addItemWithButton() = runBlockingTest {
+        if(!writeSucceeded) {
+            Log.e(TAG, "Setup must have failed. Exit")
+            return@runBlockingTest
+        }
 
+        val itemWriteSucceeded = addItem("Food")
+
+        if(!itemWriteSucceeded){
+            Log.e(TAG, "Error when adding items to gratitude list")
+            return@runBlockingTest
+        }
+
+
+        // the below seems to run on ui thread anyway
+        Log.d(TAG, "Try to create bundle with $gratitudeListKey")
+        val bundle = bundleOf("gratitudeListIdKey" to gratitudeListKey)
+        val scenario = launchFragmentInContainer<GratitudeDetailFragment>(
+            bundle,
+            R.style.Theme_Sossego
+        )
+        dataBindingIdlingResource.monitorFragment(scenario)
+
+        // Initially 1
+        onView(withId(R.id.gratitude_detail_recycler))
+            .check(hasItemCount(1))
+
+        // Now let's type and press Add and check we got 2
+        onView(withId(R.id.new_gratitude_item)).perform(clearText(),typeText("Buttons"))
+        // Click the add button
+        onView(withId(R.id.add_item_button)).perform(click())
+        onView(withId(R.id.new_gratitude_item)).perform(clearText(),typeText("Lists"))
+        // Click the add button
+        onView(withId(R.id.add_item_button)).perform(click())
+
+        // Note that we need to use the idling resources or this happens too quickly and espresso
+        // doesn't know to wait
+        onView(withId(R.id.gratitude_detail_recycler))
+            .check(hasItemCount(3))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun clearButton_RemovesItems() = runBlockingTest {
+        if(!writeSucceeded) {
+            Log.e(TAG, "Setup must have failed. Exit")
+            return@runBlockingTest
+        }
+
+        val itemWriteSucceeded1 = addItem("A")
+        val itemWriteSucceeded2 = addItem("B")
+        val itemWriteSucceeded3 = addItem("C")
+
+        if(listOf(itemWriteSucceeded1, itemWriteSucceeded2, itemWriteSucceeded3).any{false}){
+            Log.e(TAG, "Error when adding items to gratitude list")
+            return@runBlockingTest
+        }
+
+
+        // the below seems to run on ui thread anyway
+        Log.d(TAG, "Try to create bundle with $gratitudeListKey")
+        val bundle = bundleOf("gratitudeListIdKey" to gratitudeListKey)
+        val scenario = launchFragmentInContainer<GratitudeDetailFragment>(
+            bundle,
+            R.style.Theme_Sossego
+        )
+        dataBindingIdlingResource.monitorFragment(scenario)
+
+        // GIVEN- Initially 3
+        onView(withId(R.id.gratitude_detail_recycler))
+            .check(hasItemCount(3))
+
+        // WHEN -  click clear button
+        onView(withId(R.id.gratitude_detail_clear_button)).perform(click())
+
+        // THEN - Should be zero
+        onView(withId(R.id.gratitude_detail_recycler))
+            .check(hasItemCount(0))
+    }
 }
