@@ -286,6 +286,7 @@ class GratitudeListingFragmentTest: AutoCloseKoinTest() {
         // GIVEN
         clear_lists()
         firebaseAuth.signInWithEmailAndPassword(email, password)
+
         val scenario = launchFragmentInContainer<GratitudeFragment>(Bundle(), R.style.Theme_Sossego)
         val navController = mock(NavController::class.java)
         scenario.onFragment {

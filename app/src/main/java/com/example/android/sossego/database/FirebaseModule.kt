@@ -208,7 +208,6 @@ class AppDatabase: KoinComponent {
 
                 if (appDatabase == null) {
                     appDatabase =  AppDatabase()
-                    appDatabase!!.database.setPersistenceEnabled(true)
                     appDatabase!!.dbRootRef = appDatabase!!.database.reference
                     appDatabase!!.gratitudeListNode = appDatabase!!.dbRootRef.child("gratitude_lists")
                     appDatabase!!.journalEntryNode = appDatabase!!.dbRootRef.child("journal_entries")

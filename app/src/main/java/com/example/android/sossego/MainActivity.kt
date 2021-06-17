@@ -74,11 +74,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun initKoin() {
+        val firebaseDatabase = FirebaseDatabase.getInstance()
+        firebaseDatabase.setPersistenceEnabled(true)
 
         val myModule = module {
             single {
-                val firebaseDatabase = FirebaseDatabase.getInstance()
-                firebaseDatabase.setPersistenceEnabled(true)
+                firebaseDatabase
             }
             single {FirebaseAuth.getInstance()}
             single {

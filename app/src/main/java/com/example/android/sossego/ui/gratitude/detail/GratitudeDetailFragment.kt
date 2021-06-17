@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.sossego.MainActivity
 import com.example.android.sossego.R
 import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
@@ -49,7 +51,10 @@ class GratitudeDetailFragment : Fragment(), KoinComponent {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
-        (activity as AppCompatActivity).supportActionBar?.title = "Edit Gratitude List"
+        // If don't set this then during androidTests hit the exception
+        // EmptyFragmentActivity cannot be cast to androidx.appcompat.app.AppCompatActivity
+        if(requireActivity() is MainActivity)
+            (activity as AppCompatActivity).supportActionBar?.title = "Edit Gratitude List"
 
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentGratitudeDetailBinding = DataBindingUtil.inflate(
