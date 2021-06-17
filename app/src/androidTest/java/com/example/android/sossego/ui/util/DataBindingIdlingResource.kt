@@ -82,6 +82,7 @@ fun DataBindingIdlingResource.monitorActivity(
 
 /**
  * Sets the fragment from a [FragmentScenario] to be used from [DataBindingIdlingResource].
+ * This beaks in later versions of fragment testing lib, see https://knowledge.udacity.com/questions/451195
  */
 fun DataBindingIdlingResource.monitorFragment(fragmentScenario: FragmentScenario<out Fragment>) {
     fragmentScenario.onFragment {

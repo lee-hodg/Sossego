@@ -170,6 +170,7 @@ dependencies {
     androidTestImplementation "junit:junit:4.13"
     //androidTestImplementation "androidx.fragment:fragment-testing:1.4.0-alpha02"
     // stick to this version to databinding idling resource works for fragment monitor
+    // see https://knowledge.udacity.com/questions/451195
     debugImplementation('androidx.fragment:fragment-testing:1.2.5') {
         // exclude androidx.test:core while fragment_testing depends on 1.1.0
         exclude group: 'androidx.test', module: 'core'
