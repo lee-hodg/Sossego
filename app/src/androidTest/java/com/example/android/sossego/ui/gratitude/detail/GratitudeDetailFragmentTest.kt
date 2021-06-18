@@ -22,7 +22,7 @@ import com.example.android.sossego.database.gratitude.FirebaseGratitudeList
 import com.example.android.sossego.database.gratitude.repository.GratitudeRepository
 import com.example.android.sossego.database.journal.repository.JournalRepository
 import com.example.android.sossego.database.user.repository.UserRepository
-import com.example.android.sossego.ui.gratitude.detail.CustomAssertions.Companion.hasItemCount
+import com.example.android.sossego.ui.CustomAssertions.Companion.hasItemCount
 import com.example.android.sossego.ui.login.LoginViewModel
 import com.example.android.sossego.ui.util.DataBindingIdlingResource
 import com.example.android.sossego.ui.util.monitorFragment
@@ -49,7 +49,38 @@ import java.lang.AssertionError
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-
+/**
+ * Instead of building our own Service Locator or constructor dependency injection
+ * We can use a library like Koin to just inject the dependencies, and switch them out
+ * in the tests to test/fake versions as follows.
+ *
+ * Follow here (https://medium.com/inspiredbrilliance/getting-started-with-firebase-emulators-suite-for-android-70c1bf87ffe)
+ * to install the Firebase emulator:
+ *
+ * 1/ npm install -g firebase-tools
+ * 2/ firebase login
+ * 3/ select project
+ * 4/ firebase init
+ *
+ * Run it w/ firebase emulators:start
+ * and manage it locally here http://localhost:4000/
+ *
+ * In the Before section, we stop Koin and then inject emulator versions of these Firebase
+ * dependencies (this proxies from android emulator to host machine, get ports from the console)
+ *
+ *         firebaseDatabase.useEmulator("10.0.2.2", 9000)
+ *         firebaseAuth.useEmulator("10.0.2.2", 9099)
+ *
+ * On production Koin will set up dependencies without the emulator, so we get real db.
+ *
+ *  You also need to set cleartext true in android manifest and network_security_config.xml
+ *  in res/xml to specify the 10.0.2.2 domain
+ *
+ *  Edit firebase rules in the emulator project (~/firebaseproject) dir
+ *  I added ".write": "(auth !== null && query.orderByChild == 'userId' && query.equalTo == auth.uid)",
+ * to list root of gratitude_lists for example
+ *
+ **/
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class GratitudeDetailFragmentTest: AutoCloseKoinTest() {

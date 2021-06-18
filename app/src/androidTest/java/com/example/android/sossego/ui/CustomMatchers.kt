@@ -1,4 +1,4 @@
-package com.example.android.sossego.ui.gratitude.detail
+package com.example.android.sossego.ui
 
 
 import android.view.View
