@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.android.sossego.MainActivity
 import com.example.android.sossego.R
 import com.example.android.sossego.database.journal.FirebaseJournalEntry
 import com.example.android.sossego.database.journal.repository.JournalRepository
@@ -57,7 +58,10 @@ class JournalEntryDetailFragment : Fragment(), KoinComponent {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        (activity as AppCompatActivity).supportActionBar?.title = "Edit Journal"
+        // If don't set this then during androidTests hit the exception
+        // EmptyFragmentActivity cannot be cast to androidx.appcompat.app.AppCompatActivity
+        if(requireActivity() is MainActivity)
+            (activity as AppCompatActivity).supportActionBar?.title = "Edit Journal"
 
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentJournalDetailBinding = DataBindingUtil.inflate(

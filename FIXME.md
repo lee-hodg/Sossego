@@ -5,8 +5,6 @@
 
 # FIXME
 
-- Meditation bell audio stutters (OK on real phone)
-
 - My reminders seem to have more than 1 time per day???
 
 - If quickly toggle the time intervals sometimes errors?
